@@ -6,18 +6,59 @@
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <!-- Zahrň Simple-Peer knihovnu pro WebRTC -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-peer/9.11.1/simple-peer.min.js"></script>
-  <!-- Zahrň vlastní JavaScript soubor (script.js) -->
+  <!-- Zahrň vlastní JavaScript soubor -->
   <script src="/script.js" defer></script>
+  <style>
+    /* Styl pro video prvky */
+    video {
+      width: 300px;
+      height: 200px;
+      margin: 10px;
+      background-color: black;
+    }
+
+    /* Umístění videí na stránku */
+    #videoContainer {
+      position: absolute;
+      bottom: 50px;
+      left: 10px;
+      display: flex;
+      gap: 10px;
+    }
+
+    /* Styl tlačítka pro připojení */
+    #connectButton {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #signalData {
+      width: 80%;
+      height: 50px;
+      margin: 10px 0;
+    }
+
+    #otherPeerDataInput {
+      width: 80%;
+      height: 50px;
+    }
+  </style>
 </head>
 <body>
-  <!-- AR scéna -->
+  <!-- AR scéna s A-Frame -->
   <a-scene>
     <a-box position="0 1 -5" rotation="0 45 0" color="#4CC3D9" shadow></a-box>
     <a-sky color="#ECECEC"></a-sky>
   </a-scene>
 
-  <!-- HTML pro WebRTC video streamy -->
-  <div>
+  <!-- Kontejner pro WebRTC videa -->
+  <div id="videoContainer">
     <video id="localVideo" autoplay playsinline muted></video>
     <video id="remoteVideo" autoplay playsinline></video>
   </div>
