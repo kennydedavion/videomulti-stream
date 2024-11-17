@@ -4,66 +4,85 @@
   <title>A-Frame AR s WebRTC</title>
   <!-- Zahrň A-Frame knihovnu -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  
   <!-- Zahrň Simple-Peer knihovnu pro WebRTC -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-peer/9.11.1/simple-peer.min.js"></script>
+  
   <!-- Zahrň vlastní JavaScript soubor -->
   <script src="/script.js" defer></script>
+  
   <style>
-    /* Styl pro video prvky */
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
     video {
-      width: 300px;
-      height: 200px;
+      width: 320px;
+      height: 240px;
+      border: 2px solid #ccc;
       margin: 10px;
-      background-color: black;
     }
-
-    /* Umístění videí na stránku */
-    #videoContainer {
+    #localVideo {
       position: absolute;
-      bottom: 50px;
+      top: 10px;
       left: 10px;
+    }
+    #remoteVideo {
+      position: absolute;
+      top: 10px;
+      left: 350px;
+    }
+    /* A-Frame nastavení */
+    a-scene {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    .video-container {
       display: flex;
-      gap: 10px;
-    }
-
-    /* Styl tlačítka pro připojení */
-    #connectButton {
+      justify-content: space-between;
       position: absolute;
-      bottom: 10px;
-      left: 10px;
+      top: 50px;
+      left: 50px;
+      z-index: 1;
+    }
+    .video-container video {
+      border: 3px solid black;
+    }
+    #signalData {
+      width: 300px;
+      height: 100px;
+      margin-top: 20px;
+    }
+    #connectButton {
       padding: 10px 20px;
-      background-color: #4CAF50;
+      background-color: blue;
       color: white;
       border: none;
       cursor: pointer;
     }
-
-    #signalData {
-      width: 80%;
-      height: 50px;
-      margin: 10px 0;
-    }
-
-    #otherPeerDataInput {
-      width: 80%;
-      height: 50px;
+    #connectButton:hover {
+      background-color: darkblue;
     }
   </style>
 </head>
 <body>
-  <!-- AR scéna s A-Frame -->
-  <a-scene>
-    <a-box position="0 1 -5" rotation="0 45 0" color="#4CC3D9" shadow></a-box>
-    <a-sky color="#ECECEC"></a-sky>
-  </a-scene>
-
-  <!-- Kontejner pro WebRTC videa -->
-  <div id="videoContainer">
-    <video id="localVideo" autoplay playsinline muted></video>
-    <video id="remoteVideo" autoplay playsinline></video>
+  <div class="video-container">
+    <video id="localVideo" autoplay muted></video>
+    <video id="remoteVideo" autoplay></video>
   </div>
-
-  <!-- Tlačítko pro spojení WebRTC -->
+  <textarea id="signalData" readonly></textarea>
   <button id="connectButton">Připojit k druhému uživateli</button>
+  
+  <!-- A-Frame VR/AR scena -->
+  <a-scene>
+    <a-box position="0 1 -5" color="blue"></a-box>
+    <a-camera look-controls="pointerLockEnabled: true;"></a-camera>
+  </a-scene>
 </body>
 </html>
