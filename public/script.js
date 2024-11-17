@@ -1,7 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
-  // Odkazy na video prvky
+  // Odkazy na video prvky a další prvky na stránce
   const localVideo = document.getElementById('localVideo');
   const remoteVideo = document.getElementById('remoteVideo');
+  const signalDataTextarea = document.getElementById('signalData');
+  const otherPeerDataInput = document.getElementById('otherPeerDataInput');
+  const connectButton = document.getElementById('connectButton');
   let localStream;
 
   // Získání místního streamu (kamera + mikrofon)
@@ -16,10 +19,9 @@ document.addEventListener('DOMContentLoaded', function () {
       stream: localStream
     });
 
-    // Zachytávání signálu a jeho sdílení s druhým peerem
+    // Zobrazení signálových dat v textovém poli
     peer.on('signal', data => {
-      console.log('SIGNAL', JSON.stringify(data));
-      alert('SIGNAL DATA: ' + JSON.stringify(data)); // Ukáže data ke sdílení
+      signalDataTextarea.value = JSON.stringify(data);
     });
 
     // Přijetí vzdáleného streamu a zobrazení ve video prvku
@@ -27,9 +29,9 @@ document.addEventListener('DOMContentLoaded', function () {
       remoteVideo.srcObject = remoteStream;
     });
 
-    // Tlačítko pro připojení k druhému uživateli
-    document.getElementById('connectButton').addEventListener('click', () => {
-      const otherPeerData = prompt('Vložte data z druhého peeru');
+    // Obsluha kliknutí na tlačítko pro připojení k druhému uživateli
+    connectButton.addEventListener('click', () => {
+      const otherPeerData = otherPeerDataInput.value;
       if (otherPeerData) {
         peer.signal(JSON.parse(otherPeerData));
       }

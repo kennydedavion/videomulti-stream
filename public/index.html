@@ -63,6 +63,15 @@
     <video id="remoteVideo" autoplay playsinline></video>
   </div>
 
+    <!-- Textová pole pro signálová data -->
+  <div style="position: absolute; bottom: 50px; left: 10px;">
+    <label for="signalData">Váš signálový kód:</label>
+    <textarea id="signalData" readonly></textarea>
+    <br />
+    <label for="otherPeerDataInput">Signálový kód druhého uživatele:</label>
+    <textarea id="otherPeerDataInput"></textarea>
+  </div>
+  
   <!-- Tlačítko pro spojení WebRTC -->
   <button id="connectButton">Připojit k druhému uživateli</button>
 </body>
