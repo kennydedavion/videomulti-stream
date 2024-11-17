@@ -9,44 +9,74 @@
   <!-- Zahrň vlastní JavaScript soubor -->
   <script src="/script.js" defer></script>
   <style>
-    /* Styl pro video prvky */
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* Skryje případné posuvníky */
+      font-family: Arial, sans-serif;
+    }
+
+    #videoContainer {
+      position: absolute;
+      bottom: 100px;
+      left: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      width: 100%;
+    }
+
     video {
-      width: 300px;
-      height: 200px;
-      margin: 10px;
+      width: 100%;
+      max-width: 300px;
+      height: auto;
       background-color: black;
     }
 
-    /* Umístění videí na stránku */
-    #videoContainer {
-      position: absolute;
-      bottom: 50px;
-      left: 10px;
-      display: flex;
-      gap: 10px;
-    }
-
-    /* Styl tlačítka pro připojení */
-    #connectButton {
+    #signalSection {
       position: absolute;
       bottom: 10px;
       left: 10px;
+      width: calc(100% - 20px); /* Aby se vešel na obrazovku */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #signalData, #otherPeerDataInput {
+      width: 90%;
+      max-width: 600px;
+      height: 50px;
+      margin: 5px 0;
+    }
+
+    #connectButton {
       padding: 10px 20px;
       background-color: #4CAF50;
       color: white;
       border: none;
       cursor: pointer;
-    }
-
-    #signalData {
-      width: 80%;
-      height: 50px;
       margin: 10px 0;
+      max-width: 200px;
     }
 
-    #otherPeerDataInput {
-      width: 80%;
-      height: 50px;
+    /* Média dotazy pro mobilní zařízení */
+    @media (max-width: 768px) {
+      #videoContainer {
+        bottom: 120px;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      #signalSection {
+        bottom: 10px;
+        width: 100%;
+      }
+
+      #connectButton {
+        width: 80%;
+      }
     }
   </style>
 </head>
@@ -63,16 +93,15 @@
     <video id="remoteVideo" autoplay playsinline></video>
   </div>
 
-    <!-- Textová pole pro signálová data -->
-  <div style="position: absolute; bottom: 50px; left: 10px;">
+  <!-- Sekce pro signálová data -->
+  <div id="signalSection">
     <label for="signalData">Váš signálový kód:</label>
     <textarea id="signalData" readonly></textarea>
     <br />
     <label for="otherPeerDataInput">Signálový kód druhého uživatele:</label>
     <textarea id="otherPeerDataInput"></textarea>
+    <br />
+    <button id="connectButton">Připojit k druhému uživateli</button>
   </div>
-  
-  <!-- Tlačítko pro spojení WebRTC -->
-  <button id="connectButton">Připojit k druhému uživateli</button>
 </body>
 </html>
