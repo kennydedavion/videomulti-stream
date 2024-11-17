@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>AR Video Call Demo</title>
+  <title>Ahoj Node - A-Frame AR Stránka</title>
+  <!-- Zahrň A-Frame knihovnu -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <!-- Přidej odkaz na Socket.IO klienta -->
-  <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
-  <!-- AR Scéna -->
+  <!-- AR scéna -->
   <a-scene>
-    <a-camera position="0 1.6 0"></a-camera>
-    <a-box position="0 1 -3" color="#4CC3D9"></a-box>
+    <!-- Jednoduchý 3D objekt, který by měl být vidět v AR prostředí -->
+    <a-box position="0 1 -5" rotation="0 45 0" color="#4CC3D9" shadow></a-box>
+    <a-sky color="#ECECEC"></a-sky>
   </a-scene>
+  <input type="text" id="color-input" placeholder="Zadejte barvu (např. red, #FF0000)">
+<button type="button" onclick="changeColor()">Změnit Barvu</button>
 </body>
 </html>
