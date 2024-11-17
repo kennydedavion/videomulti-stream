@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
+  // Ověření, zda je SimplePeer dostupný
+  if (typeof SimplePeer === 'undefined') {
+    console.error('SimplePeer není definován! Ujisti se, že je knihovna správně načtena.');
+    return;
+  }
   // Odkazy na video prvky a další prvky na stránce
   const localVideo1 = document.getElementById('localVideo1');
   const localVideo2 = document.getElementById('localVideo2');
