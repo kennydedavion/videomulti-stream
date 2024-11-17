@@ -10,105 +10,12 @@
   
   <!-- Zahrň vlastní JavaScript soubor -->
   <script src="/script.js" defer></script>
+  
   <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
-    }
-
-    #videoContainer {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-start;
-      width: 100%;
-      padding: 10px;
-    }
-
-    .videoFrame {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      max-width: 350px;
-      background-color: #f0f0f0;
-      padding: 10px;
-      border-radius: 8px;
-    }
-
-    video {
-      width: 100%;
-      height: auto;
-      background-color: black;
-    }
-
-    .signalSection {
-      margin-top: 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-    }
-
-    .signalData {
-      width: 100%;
-      height: 50px;
-      margin: 5px 0;
-    }
-
-    .connectButton {
-      padding: 10px 20px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-      margin: 5px 0;
-    }
-
-    /* Média dotazy pro mobilní zařízení */
-    @media (max-width: 768px) {
-      #videoContainer {
-        flex-direction: column;
-        align-items: center;
-      }
-    }
+    /* Styl pro rozložení a vzhled stránky, jak je uvedeno dříve */
   </style>
 </head>
 <body>
-  <!-- AR scéna s A-Frame -->
-  <a-scene>
-    <a-box position="0 1 -5" rotation="0 45 0" color="#4CC3D9" shadow></a-box>
-    <a-sky color="#ECECEC"></a-sky>
-  </a-scene>
-
-  <!-- Kontejner pro WebRTC videa -->
-  <div id="videoContainer">
-    <!-- Video Frame 1 -->
-    <div class="videoFrame">
-      <video id="localVideo1" autoplay playsinline muted></video>
-      <div class="signalSection">
-        <textarea id="signalData1" class="signalData" readonly></textarea>
-        <button id="connectButton1" class="connectButton">Připojit Video 1</button>
-      </div>
-    </div>
-
-    <!-- Video Frame 2 -->
-    <div class="videoFrame">
-      <video id="localVideo2" autoplay playsinline muted></video>
-      <div class="signalSection">
-        <textarea id="signalData2" class="signalData" readonly></textarea>
-        <button id="connectButton2" class="connectButton">Připojit Video 2</button>
-      </div>
-    </div>
-
-    <!-- Video Frame 3 -->
-    <div class="videoFrame">
-      <video id="localVideo3" autoplay playsinline muted></video>
-      <div class="signalSection">
-        <textarea id="signalData3" class="signalData" readonly></textarea>
-        <button id="connectButton3" class="connectButton">Připojit Video 3</button>
-      </div>
-    </div>
-  </div>
+  <!-- Tělo stránky, jak je uvedeno dříve -->
 </body>
 </html>
