@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const remoteVideo = document.getElementById('remoteVideo');
   let localStream;
 
-  // Konfigurace WebRTC
+  // Získání místního streamu (kamera + mikrofon)
   navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
     localVideo.srcObject = stream;
     localStream = stream;
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Zachytávání signálu a jeho sdílení s druhým peerem
     peer.on('signal', data => {
       console.log('SIGNAL', JSON.stringify(data));
-      // Poslat data druhé straně (např. pomocí websocketů nebo URL)
+      // Zobrazí data, která musíš poslat druhé straně
     });
 
     // Přijetí vzdáleného streamu
@@ -28,12 +28,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Příklad přijetí signálu z druhé strany
-    // Vlož data získaná od druhého peera
     document.getElementById('connectButton').addEventListener('click', () => {
       const otherPeerData = prompt('Vložte data z druhého peeru');
       peer.signal(JSON.parse(otherPeerData));
     });
   }).catch(err => {
-    console.error('Failed to get local stream:', err);
+    console.error('Nepodařilo se získat místní stream:', err);
   });
 });
