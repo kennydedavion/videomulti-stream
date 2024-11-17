@@ -4,6 +4,8 @@
   <title>Ahoj Node - A-Frame AR Stránka</title>
   <!-- Zahrň A-Frame knihovnu -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <!-- Přidání Simple-Peer knihovny pro WebRTC -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/simple-peer/9.11.1/simple-peer.min.js"></script>
 </head>
 <body>
   <!-- AR scéna -->
@@ -14,5 +16,17 @@
   </a-scene>
   <input type="text" id="color-input" placeholder="Zadejte barvu (např. red, #FF0000)">
 <button type="button" onclick="changeColor()">Změnit Barvu</button>
+</body>
+  <body>
+  <a-scene>
+    <a-box position="0 1 -5" rotation="0 45 0" color="#4CC3D9" shadow></a-box>
+    <a-sky color="#ECECEC"></a-sky>
+  </a-scene>
+
+  <!-- HTML pro WebRTC video -->
+  <div>
+    <video id="localVideo" autoplay playsinline muted></video>
+    <video id="remoteVideo" autoplay playsinline></video>
+  </div>
 </body>
 </html>
