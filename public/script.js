@@ -4,7 +4,9 @@ document.addEventListener('DOMContentLoaded', function () {
     console.error('SimplePeer není definován! Ujisti se, že je knihovna správně načtena.');
     return;
   }
-  // Odkazy na video prvky a další prvky na stránce
+
+  // Tady začíná zbytek kódu pro vytvoření Peerů, připojení a přenos médií
+
   const localVideo1 = document.getElementById('localVideo1');
   const localVideo2 = document.getElementById('localVideo2');
   const localVideo3 = document.getElementById('localVideo3');
