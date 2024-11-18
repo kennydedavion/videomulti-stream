@@ -1,17 +1,14 @@
 const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
-const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
 
 // Inicializace WebSocket serveru
-const wss = new WebSocket.Server({ server }); // Používáme server pro WebSocket server
-
+const wss = new WebSocket.Server({ server });
 let clients = {}; // Ukládání připojených klientů
 
-// Obsluha připojení WebSocket klientů
 wss.on('connection', (ws) => {
   const userId = generateUniqueId();
   clients[userId] = ws;
@@ -21,11 +18,10 @@ wss.on('connection', (ws) => {
   // Odeslání zprávy o počtu připojených uživatelů všem klientům
   broadcastUserCount();
 
-  // Příjem zpráv od klienta
-  ws.on('message', message => {
+  ws.on('message', (message) => {
     console.log('Přijato zprávu: %s', message);
     // Zde přeposíláme zprávu všem připojeným klientům
-    wss.clients.forEach(client => {
+    wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(message);
       }
@@ -50,16 +46,15 @@ function broadcastUserCount() {
   const userCount = Object.keys(clients).length;
   const message = JSON.stringify({ type: 'userCount', count: userCount });
 
-  // Zasíláme počet uživatelů každému připojenému klientovi
   Object.values(clients).forEach((client) => {
     client.send(message);
   });
 }
 
 // Servírování statických souborů z public složky
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 
-// Port nastavení
+// Port nastavení pro Glitch
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server běží na portu ${PORT}`);

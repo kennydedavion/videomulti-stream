@@ -1,20 +1,42 @@
 // WebSocket připojení
-const socket = new WebSocket('wss://jinyvesmir.glitch.me'); // Používáme 'wss' pro šifrované připojení
+const socket = new WebSocket('wss://jinyvesmir.glitch.me');
 
-// Odeslání zprávy o připojení
+// Elementy pro video a počet uživatelů
+const videoContainer = document.getElementById('videoContainer');
+const userCountElem = document.getElementById('userCount');
+
+// Nastavení připojení
 socket.onopen = () => {
   console.log('Připojeno k WebSocket serveru');
-  socket.send(JSON.stringify({ type: 'join' })); // Odeslání zprávy o připojení
 };
 
-// Přijetí zpráv od serveru
+// Příjem zpráv
 socket.onmessage = (event) => {
-  const data = JSON.parse(event.data);
+  const message = JSON.parse(event.data);
 
-  // Aktualizace počtu uživatelů
-  if (data.type === 'userCount') {
-    userCountElement.textContent = `Počet uživatelů: ${data.count}`;
+  if (message.type === 'userCount') {
+    userCountElem.textContent = `Uživatelé: ${message.count}`;
+  } else if (message.type === 'video') {
+    // Přidání nového videa do kontejneru
+    const newVideo = document.createElement('video');
+    newVideo.srcObject = message.stream;
+    newVideo.play();
+    videoContainer.appendChild(newVideo);
   }
-
-  // Další zpracování zpráv...
 };
+
+// Připojení k videu
+navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+  .then((stream) => {
+    // Po získání streamu, pošleme jej na server
+    socket.send(JSON.stringify({ type: 'video', stream: stream }));
+
+    // Zobrazení vlastního videa
+    const myVideo = document.createElement('video');
+    myVideo.srcObject = stream;
+    myVideo.play();
+    videoContainer.appendChild(myVideo);
+  })
+  .catch((err) => {
+    console.log('Chyba při připojování k médiím:', err);
+  });
