@@ -18,22 +18,45 @@
       overflow: hidden;
       font-family: Arial, sans-serif;
     }
+    .video-container {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      position: absolute;
+      top: 50px;
+      left: 50px;
+      right: 50px;
+      z-index: 1;
+    }
+    .video-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 20%;
+    }
     video {
-      width: 320px;
-      height: 240px;
+      width: 100%;
+      height: auto;
       border: 2px solid #ccc;
-      margin: 10px;
     }
-    #localVideo {
-      position: absolute;
-      top: 10px;
-      left: 10px;
+    textarea {
+      width: 100%;
+      height: 8px;
+      margin-top: 5px;
     }
-    #remoteVideo {
-      position: absolute;
-      top: 10px;
-      left: 350px;
+    #connectButton {
+      padding: 10px;
+      background-color: blue;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 5px;
+      font-size: 14px;
     }
+    #connectButton:hover {
+      background-color: darkblue;
+    }
+    
     /* A-Frame nastavení */
     a-scene {
       position: absolute;
@@ -43,41 +66,26 @@
       height: 100%;
       z-index: -1;
     }
-    .video-container {
-      display: flex;
-      justify-content: space-between;
-      position: absolute;
-      top: 50px;
-      left: 50px;
-      z-index: 1;
-    }
-    .video-container video {
-      border: 3px solid black;
-    }
-    #signalData {
-      width: 300px;
-      height: 100px;
-      margin-top: 20px;
-    }
-    #connectButton {
-      padding: 10px 20px;
-      background-color: blue;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    #connectButton:hover {
-      background-color: darkblue;
-    }
   </style>
 </head>
 <body>
   <div class="video-container">
-    <video id="localVideo" autoplay muted></video>
-    <video id="remoteVideo" autoplay></video>
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted></video>
+      <textarea id="localSignalData" readonly></textarea>
+      <button id="localConnectButton">Připojit k uživateli</button>
+    </div>
+    <div class="video-wrapper">
+      <video id="remoteVideo1" autoplay></video>
+      <textarea id="remoteSignalData1" readonly></textarea>
+      <button id="remoteConnectButton1">Připojit k uživateli</button>
+    </div>
+    <div class="video-wrapper">
+      <video id="remoteVideo2" autoplay></video>
+      <textarea id="remoteSignalData2" readonly></textarea>
+      <button id="remoteConnectButton2">Připojit k uživateli</button>
+    </div>
   </div>
-  <textarea id="signalData" readonly></textarea>
-  <button id="connectButton">Připojit k druhému uživateli</button>
   
   <!-- A-Frame VR/AR scena -->
   <a-scene>
