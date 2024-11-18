@@ -1,10 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
   const localVideo = document.getElementById('localVideo');
-  const remoteVideos = [
-    document.getElementById('remoteVideo1'),
-    document.getElementById('remoteVideo2')
-  ];
+  const videoContainer = document.getElementById('videoContainer');
   const userCountElement = document.getElementById('userCount');
+  const logElement = document.getElementById('log');
   
   let localStream;
   let peerConnections = {};  // Uložení všech peer připojení
@@ -19,9 +17,18 @@ document.addEventListener('DOMContentLoaded', function () {
   socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
 
-    // Aktualizace počtu uživatelů
+    // Logování zpráv (připojení, odpojení, atd.)
     if (data.type === 'userCount') {
       userCountElement.textContent = `Počet uživatelů: ${data.count}`;
+    }
+
+    // Přidání logu
+    if (data.type === 'join') {
+      logElement.innerHTML += `<p>Nový uživatel připojen: ${data.userId}</p>`;
+    }
+
+    if (data.type === 'leave') {
+      logElement.innerHTML += `<p>Uživatel ${data.userId} se odpojil</p>`;
     }
 
     // Zpracování nabídky (offer) od jiného uživatele
@@ -46,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
     localStream = stream;
 
     // Připojení k serveru
-    socket.send(JSON.stringify({ type: 'join' }));
+    socket.send(JSON.stringify({ type: 'join', userId: generateUniqueId() }));
   }).catch(err => {
     console.error('Nepodařilo se získat místní stream:', err);
   });
@@ -67,14 +74,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     peerConnection.ontrack = event => {
       let remoteVideoElement;
-      for (let i = 0; i < remoteVideos.length; i++) {
-        if (!remoteVideos[i].srcObject) {
-          remoteVideoElement = remoteVideos[i];
+      // Hledáme první volný video frame
+      const allVideos = document.querySelectorAll('video');
+      for (let i = 1; i < allVideos.length; i++) {
+        if (!allVideos[i].srcObject) {
+          remoteVideoElement = allVideos[i];
           break;
         }
       }
       if (remoteVideoElement) {
         remoteVideoElement.srcObject = event.streams[0];
+        remoteVideoElement.style.display = 'block';  // Ukázání videa
       }
     };
 
@@ -112,14 +122,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // Odeslání nabídky při připojení nového uživatele
-  socket.onmessage = (event) => {
-    const data = JSON.parse(event.data);
+  // Generování unikátního ID uživatele
+  function generateUniqueId() {
+    return Math.random().toString(36).substr(2, 9);
+  }
 
-    if (data.type === 'join') {
-      // Pokud je nový uživatel připojen, vytvoříme pro něj nabídku
-      const newUserId = data.userId;
-      createOfferForNewUser(newUserId);
-    }
-  };
 });

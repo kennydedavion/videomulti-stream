@@ -15,53 +15,19 @@ wss.on('connection', (ws) => {
   const userId = generateUniqueId();
   clients[userId] = ws;
 
-  console.log('Nový uživatel připojen');
-
-  // Odeslání zprávy o počtu připojených uživatelů všem klientům
+  // Odeslání zprávy o počtu připojených uživatelů
   broadcastUserCount();
+
+  // Záznam připojení uživatele
+  broadcastLog(`Nový uživatel připojen: ${userId}`);
 
   // Příjem zpráv od klienta
   ws.on('message', message => {
-    console.log('Přijato zprávu: %s', message);
     const data = JSON.parse(message);
-
-    if (data.type === 'offer') {
-      // Poslat nabídku (offer) ostatním uživatelům
-      Object.keys(clients).forEach((clientId) => {
-        if (clientId !== userId) {
-          clients[clientId].send(JSON.stringify({
-            type: 'offer',
-            offer: data.offer,
-            userId: userId
-          }));
-        }
-      });
-    }
-
-    if (data.type === 'answer') {
-      // Poslat odpověď (answer) ostatním uživatelům
-      Object.keys(clients).forEach((clientId) => {
-        if (clientId !== userId) {
-          clients[clientId].send(JSON.stringify({
-            type: 'answer',
-            answer: data.answer,
-            userId: userId
-          }));
-        }
-      });
-    }
-
-    if (data.type === 'candidate') {
-      // Poslat kandidáta (candidate) ostatním uživatelům
-      Object.keys(clients).forEach((clientId) => {
-        if (clientId !== userId) {
-          clients[clientId].send(JSON.stringify({
-            type: 'candidate',
-            candidate: data.candidate,
-            userId: userId
-          }));
-        }
-      });
+    if (data.type === 'join') {
+      // Odeslání zprávy pro všechny ostatní
+      broadcastLog(`Uživatel ${userId} připojen`);
+      broadcastUserCount();
     }
   });
 
@@ -69,6 +35,7 @@ wss.on('connection', (ws) => {
   ws.on('close', () => {
     console.log(`Uživatel ${userId} se odpojil`);
     delete clients[userId];
+    broadcastLog(`Uživatel ${userId} se odpojil`);
     broadcastUserCount();
   });
 });
@@ -85,6 +52,15 @@ function broadcastUserCount() {
 
   Object.values(clients).forEach((client) => {
     client.send(message);
+  });
+}
+
+// Funkce pro odesílání logu všem klientům
+function broadcastLog(message) {
+  const logMessage = JSON.stringify({ type: 'log', message: message });
+
+  Object.values(clients).forEach((client) => {
+    client.send(logMessage);
   });
 }
 

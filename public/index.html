@@ -37,34 +37,48 @@
     .video-container {
       display: flex;
       flex-direction: row;
-      justify-content: center;
-      gap: 10px;
+      justify-content: flex-start;
+      align-items: flex-start;
       margin-top: 20px;
+      gap: 0;
     }
 
     video {
       width: 300px;
       height: 200px;
       border: 2px solid #000;
+      display: none;  /* Initially hidden */
     }
 
     #userCount {
       font-size: 20px;
       margin-top: 20px;
     }
+
+    #log {
+      margin-top: 20px;
+      max-height: 200px;
+      overflow-y: scroll;
+      width: 80%;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      padding: 10px;
+      font-family: monospace;
+    }
+
   </style>
 </head>
 <body>
 
   <div id="logo">LOGO</div>
   
-  <div class="video-container">
+  <div class="video-container" id="videoContainer">
     <video id="localVideo" autoplay muted></video>
-    <video id="remoteVideo1" autoplay></video>
-    <video id="remoteVideo2" autoplay></video>
   </div>
 
   <div id="userCount">Počet uživatelů: 0</div>
+
+  <div id="log"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/peerjs@1.4.3/dist/peerjs.min.js"></script>
   <script src="script.js"></script>
