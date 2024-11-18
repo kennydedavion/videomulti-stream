@@ -2,64 +2,16 @@
 <html>
 <head>
   <title>A-Frame AR s WebRTC</title>
-  <!-- Zahrň A-Frame knihovnu -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  
-  <!-- Zahrň vlastní JavaScript soubory -->
   <script src="/script.js" defer></script>
-
+  
   <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
-    }
-    .video-container {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      position: absolute;
-      top: 50px;
-      left: 50px;
-      right: 50px;
-      z-index: 1;
-    }
-    .video-wrapper {
-      display: none; /* Skryté, dokud se uživatel nepřipojí */
-      flex-direction: column;
-      align-items: center;
-      max-width: 20%;
-      transition: transform 0.3s ease;
-    }
-    video {
-      width: 100%;
-      height: auto;
-      border: 2px solid #ccc;
-    }
-    
-    /* A-Frame nastavení */
-    a-scene {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-    }
-
-    /* Počet uživatelů */
-    .user-count {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background-color: rgba(0, 0, 0, 0.5);
-      color: #fff;
-      padding: 10px;
-      border-radius: 5px;
-      font-size: 16px;
-      z-index: 10;
-    }
+    body, html { margin: 0; padding: 0; overflow: hidden; font-family: Arial, sans-serif; }
+    .video-container { display: flex; justify-content: space-around; align-items: center; position: absolute; top: 50px; left: 50px; right: 50px; z-index: 1; }
+    .video-wrapper { display: none; flex-direction: column; align-items: center; max-width: 20%; transition: transform 0.3s ease; }
+    video { width: 100%; height: auto; border: 2px solid #ccc; }
+    a-scene { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+    .user-count { position: absolute; top: 10px; left: 10px; background-color: rgba(0, 0, 0, 0.5); color: #fff; padding: 10px; border-radius: 5px; font-size: 16px; z-index: 10; }
   </style>
 </head>
 <body>
@@ -77,10 +29,9 @@
     </div>
   </div>
   
-  <!-- A-Frame VR/AR scena -->
   <a-scene>
     <a-box position="0 1 -5" color="blue"></a-box>
-    <a-camera look-controls="enabled: true; pointerLockEnabled: true;"></a-camera>
+    <a-camera look-controls="pointerLockEnabled: true;"></a-camera>
   </a-scene>
 </body>
 </html>
