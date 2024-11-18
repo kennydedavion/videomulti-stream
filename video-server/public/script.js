@@ -1,5 +1,5 @@
 // WebSocket připojení k video serveru
-const socket = new WebSocket('wss://jinyvesmir.glitch.me:3001'); // Ujistěte se, že používáte správný URL pro server
+const socket = new WebSocket('wss://jinyvesmir.glitch.me:4000'); // Ujistěte se, že používáte správný URL pro server
 
 // Elementy pro video a počet uživatelů
 const videoContainer = document.getElementById('videoContainer');
