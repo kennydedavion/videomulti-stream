@@ -15,54 +15,19 @@ wss.on('connection', (ws) => {
   const userId = generateUniqueId();
   clients[userId] = ws;
 
-  console.log(`Uživatel ${userId} se připojil`);
+   console.log('Nový uživatel připojen');
 
   // Odeslání zprávy o počtu připojených uživatelů všem klientům
   broadcastUserCount();
 
   // Příjem zpráv od klienta
-  ws.on('message', (message) => {
-    const data = JSON.parse(message);
-
-    switch (data.type) {
-      case 'join':
-        // Uživatel se připojil
-        console.log(`Uživatel ${userId} se připojil`);
-        break;
-
-      case 'offer':
-        // Odeslání nabídky specifikovanému uživateli
-        if (clients[data.userId]) {
-          clients[data.userId].send(JSON.stringify({
-            type: 'offer',
-            offer: data.offer,
-            userId: userId,
-          }));
-        }
-        break;
-
-      case 'answer':
-        // Odeslání odpovědi specifikovanému uživateli
-        if (clients[data.userId]) {
-          clients[data.userId].send(JSON.stringify({
-            type: 'answer',
-            answer: data.answer,
-            userId: userId,
-          }));
-        }
-        break;
-
-      case 'candidate':
-        // Odeslání ICE kandidáta specifikovanému uživateli
-        if (clients[data.userId]) {
-          clients[data.userId].send(JSON.stringify({
-            type: 'candidate',
-            candidate: data.candidate,
-            userId: userId,
-          }));
-        }
-        break;
-    }
+  ws.on('message', message => {
+    console.log('Přijato zprávu: %s', message);
+    // Zde přeposíláme zprávu všem připojeným klientům
+    wss.clients.forEach(client => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(message);
+      }
   });
 
   // Odstranění uživatele při odpojení
