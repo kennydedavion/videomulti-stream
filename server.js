@@ -94,7 +94,7 @@ function broadcastUserCount() {
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Port nastavení
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`Server běží na portu ${PORT}`);
 });
