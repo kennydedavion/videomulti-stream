@@ -18,7 +18,7 @@
     "video-server": "node video-server/server.js"
   },
   "engines": {
-    "node": "14.x"
+    "node": "16.x"
   },
   "repository": {
     "url": "https://jinyvesmir.glitch.me/"
