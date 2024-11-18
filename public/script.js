@@ -6,12 +6,10 @@ document.addEventListener('DOMContentLoaded', function () {
   const remoteVideo1 = document.getElementById('remoteVideo1');
   const remoteVideo2 = document.getElementById('remoteVideo2');
   const userCountElement = document.getElementById('userCount');
-  
+
   let localStream;
   let peerConnections = {};
-
-  // Inicializace WebSocket připojení
-  const socket = new WebSocket('wss://puffy-mercury-circle.glitch.me'); // Změněno na "wss" pro bezpečnější spojení
+  const socket = new WebSocket('ws://puffy-mercury-circle.glitch.me');
 
   // Připojení na WebSocket server
   socket.onopen = () => {
@@ -53,31 +51,28 @@ document.addEventListener('DOMContentLoaded', function () {
     console.error('Nepodařilo se získat místní stream:', err);
   });
 
-  // Klikání na video prvky
-  document.querySelectorAll('.video-wrapper video').forEach(video => {
-    video.addEventListener('click', () => {
-      video.parentElement.style.transform = 'scale(1.15)';
-      setTimeout(() => {
-        video.parentElement.style.transform = 'scale(1)';
-      }, 300); // Vrať do původní velikosti po 300ms
+  // Klikání na video pro zvětšení
+  [videoWrapper1, videoWrapper2, videoWrapper3].forEach(wrapper => {
+    wrapper.addEventListener('click', () => {
+      wrapper.style.transform = 'scale(1.15)';
     });
   });
 
-  // Funkce pro vytvoření peer připojení
-  function createPeerConnection(userId) {
+  // Funkce pro obsluhu nabídek WebRTC
+  function handleOffer(offer, userId) {
     const peerConnection = new RTCPeerConnection();
+    peerConnections[userId] = peerConnection;
 
-    peerConnection.onicecandidate = event => {
-      if (event.candidate) {
-        socket.send(JSON.stringify({
-          type: 'candidate',
-          candidate: event.candidate,
-          userId: userId
-        }));
-      }
-    };
+    localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
 
-    peerConnection.ontrack = event => {
+    peerConnection.setRemoteDescription(new RTCSessionDescription(offer)).then(() => {
+      return peerConnection.createAnswer();
+    }).then(answer => {
+      peerConnection.setLocalDescription(answer);
+      socket.send(JSON.stringify({ type: 'answer', answer, userId }));
+    });
+
+    peerConnection.ontrack = (event) => {
       if (!remoteVideo1.srcObject) {
         remoteVideo1.srcObject = event.streams[0];
         videoWrapper2.style.display = 'flex';
@@ -87,23 +82,10 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     };
 
-    // Přidání místního streamu k připojení
-    localStream.getTracks().forEach(track => {
-      peerConnection.addTrack(track, localStream);
-    });
-
-    peerConnections[userId] = peerConnection;
-    return peerConnection;
-  }
-
-  // Funkce pro zpracování nabídky (offer)
-  function handleOffer(offer, userId) {
-    const peerConnection = createPeerConnection(userId);
-    peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-
-    peerConnection.createAnswer().then(answer => {
-      peerConnection.setLocalDescription(answer);
-      socket.send(JSON.stringify({ type: 'answer', answer: answer, userId: userId }));
-    });
+    peerConnection.onicecandidate = (event) => {
+      if (event.candidate) {
+        socket.send(JSON.stringify({ type: 'candidate', candidate: event.candidate, userId }));
+      }
+    };
   }
 });
