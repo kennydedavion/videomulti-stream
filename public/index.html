@@ -10,37 +10,21 @@
       padding: 0;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
+      justify-content: flex-start;
+      align-items: flex-start;
       height: 100vh;
       background-color: #f0f0f0;
       font-family: Arial, sans-serif;
     }
 
-    #logo {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      font-size: 40px;
-      color: #00f;
-      animation: moveLogo 5s linear infinite;
-    }
-
-    @keyframes moveLogo {
-      0% { left: 20px; top: 20px; }
-      25% { left: 70%; top: 20px; }
-      50% { left: 70%; top: 70%; }
-      75% { left: 20px; top: 70%; }
-      100% { left: 20px; top: 20px; }
-    }
-
+    /* Video container styling */
     .video-container {
       display: flex;
       flex-direction: row;
       justify-content: flex-start;
       align-items: flex-start;
       margin-top: 20px;
-      gap: 0;
+      gap: 0; /* No gap between videos */
     }
 
     video {
@@ -70,8 +54,6 @@
 </head>
 <body>
 
-  <div id="logo">LOGO</div>
-  
   <div class="video-container" id="videoContainer">
     <video id="localVideo" autoplay muted></video>
   </div>
