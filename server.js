@@ -1,19 +1,17 @@
 const express = require('express');
 const http = require('http');
 const path = require('path');
-const WebSocket = require('ws'); // Import WebSocket knihovny
-// const PORT = process.env.PORT || 3001; // Změna na 3001
+const WebSocket = require('ws');
 
 const app = express();
 const server = http.createServer(app);
 
 // Inicializace WebSocket serveru
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocket.Server({ port: 3000 });
 let clients = {}; // Ukládání připojených klientů
 
 // Obsluha připojení WebSocket klientů
 wss.on('connection', (ws) => {
-  // Unikátní ID pro každého uživatele
   const userId = generateUniqueId();
   clients[userId] = ws;
 
