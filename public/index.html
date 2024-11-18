@@ -5,10 +5,7 @@
   <!-- Zahrň A-Frame knihovnu -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   
-  <!-- Zahrň Simple-Peer knihovnu pro WebRTC -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-peer/9.11.1/simple-peer.min.js"></script>
-  
-  <!-- Zahrň vlastní JavaScript soubor -->
+  <!-- Zahrň vlastní JavaScript soubory -->
   <script src="/script.js" defer></script>
   
   <style>
@@ -33,6 +30,7 @@
       flex-direction: column;
       align-items: center;
       max-width: 20%;
+      transition: transform 0.3s ease;
     }
     video {
       width: 100%;
@@ -49,9 +47,24 @@
       height: 100%;
       z-index: -1;
     }
+
+    /* Počet uživatelů */
+    .user-count {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 16px;
+      z-index: 10;
+    }
   </style>
 </head>
 <body>
+  <div class="user-count" id="userCount">Počet uživatelů: 0</div>
+  
   <div class="video-container">
     <div id="videoWrapper1" class="video-wrapper">
       <video id="localVideo" autoplay muted></video>
