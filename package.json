@@ -1,17 +1,17 @@
 {
   "dependencies": {
-    "ws": "^8.0.0",
-    "express": "^4.18.0",
-    "socket.io": "^4.0.0",
-    "fastify": "^4.21.0",
+    "@fastify/formbody": "^8.0.1",
+    "@fastify/static": "^8.0.2",
+    "@fastify/view": "^10.0.1",
+    "express": "^5.0.1",
+    "fastify": "^5.1.0",
     "handlebars": "^4.7.8",
-    "@fastify/formbody": "^7.4.0",
-    "@fastify/static": "^6.10.2",
-    "@fastify/view": "^8.0.0"
+    "socket.io": "^4.8.1",
+    "ws": "^8.18.0"
   },
   "name": "jiny.vesmir",
   "version": "0.1.0",
-  "description": "Jiny Vesmir - Misto ",
+  "description": "Jiny Vesmir - Misto pro vedome",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -22,7 +22,8 @@
   "repository": {
     "url": "https://glitch.com/edit/#!/glitch-hello-node"
   },
-  "license": "MIT",
+  "author": "Kenny",
+  "license": "MISC",
   "keywords": [
     "node",
     "glitch"

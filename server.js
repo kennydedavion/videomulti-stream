@@ -2,7 +2,7 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 const WebSocket = require('ws'); // Import WebSocket knihovny
-const PORT = process.env.PORT || 3001; // Změna na 3001
+// const PORT = process.env.PORT || 3001; // Změna na 3001
 
 const app = express();
 const server = http.createServer(app);
