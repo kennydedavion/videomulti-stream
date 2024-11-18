@@ -1,79 +1,41 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>A-Frame VR s WebRTC</title>
-  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="/script.js" defer></script>
+  <title>Testovací stránka s WebSocket</title>
   <style>
-    body, html {
+    body {
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
-    }
-    .video-container {
       display: flex;
-      justify-content: flex-start;
-      align-items: flex-start;
-      position: absolute;
-      top: 50px;
-      left: 10px;
-      z-index: 1;
-    }
-    .video-wrapper {
-      display: none; 
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      max-width: 25%;
-      margin-right: 10px;
-      transition: transform 0.3s ease;
+      height: 100vh;
+      flex-direction: column;
     }
-    video {
-      width: 100%;
-      height: auto;
-      border: 2px solid #ccc;
+    #userCount {
+      font-size: 20px;
+      margin-bottom: 10px;
     }
-    a-scene {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
+    #userList {
+      list-style-type: none;
+      padding: 0;
     }
-    .user-count {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background-color: rgba(0, 0, 0, 0.5);
-      color: #fff;
-      padding: 10px;
-      border-radius: 5px;
-      font-size: 16px;
-      z-index: 10;
+    #userList li {
+      padding: 8px;
+      margin: 4px;
+      background-color: #f4f4f4;
+      border: 1px solid #ddd;
+      border-radius: 4px;
     }
   </style>
 </head>
 <body>
-  <div class="user-count" id="userCount">Počet uživatelů: 0</div>
+  <div id="userCount">Počet připojených uživatelů: 0</div>
+  <ul id="userList"></ul>
   
-  <div class="video-container">
-    <div id="videoWrapper1" class="video-wrapper">
-      <video id="localVideo" autoplay muted></video>
-    </div>
-    <div id="videoWrapper2" class="video-wrapper">
-      <video id="remoteVideo1" autoplay></video>
-    </div>
-    <div id="videoWrapper3" class="video-wrapper">
-      <video id="remoteVideo2" autoplay></video>
-    </div>
-  </div>
-  
-  <a-scene>
-    <a-box position="0 1 -5" color="blue"></a-box>
-    <a-camera look-controls="pointerLockEnabled: true;"></a-camera>
-  </a-scene>
+  <script src="script.js"></script>
 </body>
 </html>

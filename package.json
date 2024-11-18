@@ -7,6 +7,7 @@
     "express": "^4.21.1",
     "fastify": "^5.1.0",
     "handlebars": "^4.7.8",
+    "merge-descriptors": "^1.0.3",
     "socket.io": "^4.8.1",
     "ws": "^8.18.0"
   },
@@ -28,5 +29,6 @@
   "keywords": [
     "node",
     "glitch"
-  ]
+  ],
+  "devDependencies": {}
 }

@@ -1,27 +1,18 @@
-const express = require('express');
-const http = require('http');
-const WebSocket = require('ws');
-const path = require('path');
-
-const app = express();
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
-
-let clients = {};
-
+// WebSocket server
 wss.on('connection', (ws) => {
   const userId = generateUniqueId();
   clients[userId] = ws;
 
-  console.log('Nový uživatel připojen', userId);
+  console.log('Nový uživatel připojen');
 
-  // Odesílání počtu připojených uživatelů všem klientům
+  // Odeslání zprávy o počtu připojených uživatelů všem klientům
   broadcastUserCount();
 
-  // Přijímání zpráv od klienta
+  // Příjem zpráv od klienta
   ws.on('message', (message) => {
     console.log('Přijato zprávu: %s', message);
-    // Přeposíláme zprávu všem připojeným klientům
+
+    // Zde přeposíláme zprávu všem připojeným klientům
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(message);
@@ -29,7 +20,7 @@ wss.on('connection', (ws) => {
     });
   });
 
-  // Odpojení klienta
+  // Odstranění uživatele při odpojení
   ws.on('close', () => {
     console.log(`Uživatel ${userId} se odpojil`);
     delete clients[userId];
@@ -37,25 +28,13 @@ wss.on('connection', (ws) => {
   });
 });
 
-// Funkce pro generování unikátního ID
-function generateUniqueId() {
-  return Math.random().toString(36).substr(2, 9);
-}
-
-// Funkce pro broadcast počtu uživatelů
+// Funkce pro rozesílání počtu uživatelů všem klientům
 function broadcastUserCount() {
   const userCount = Object.keys(clients).length;
   const message = JSON.stringify({ type: 'userCount', count: userCount });
-  wss.clients.forEach((client) => {
+
+  // Zasíláme počet uživatelů každému připojenému klientovi
+  Object.values(clients).forEach((client) => {
     client.send(message);
   });
 }
-
-// Statické soubory
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Spuštění serveru
-const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => {
-  console.log(`Server běží na portu ${PORT}`);
-});
