@@ -3,14 +3,13 @@ document.addEventListener('DOMContentLoaded', function () {
   const videoWrapper1 = document.getElementById('videoWrapper1');
   const videoWrapper2 = document.getElementById('videoWrapper2');
   const videoWrapper3 = document.getElementById('videoWrapper3');
-  const remoteVideo1 = document.getElementById('remoteVideo1');
-  const remoteVideo2 = document.getElementById('remoteVideo2');
+  const remoteVideos = [document.getElementById('remoteVideo1'), document.getElementById('remoteVideo2')];
   const userCountElement = document.getElementById('userCount');
   
   let localStream;
   let peerConnections = {};  // Uložení všech peer připojení
   const socket = new WebSocket(`wss://${window.location.host}`);
-  
+
   // Připojení na WebSocket server
   socket.onopen = () => {
     console.log('Připojeno k WebSocket serveru');
@@ -53,16 +52,6 @@ document.addEventListener('DOMContentLoaded', function () {
     console.error('Nepodařilo se získat místní stream:', err);
   });
 
-  // Klikání na video prvky
-  document.querySelectorAll('.video-wrapper video').forEach(video => {
-    video.addEventListener('click', () => {
-      video.parentElement.style.transform = 'scale(1.15)';
-      setTimeout(() => {
-        video.parentElement.style.transform = 'scale(1)';
-      }, 300); // Vrať do původní velikosti po 300ms
-    });
-  });
-
   // Funkce pro vytvoření peer připojení
   function createPeerConnection(userId) {
     const peerConnection = new RTCPeerConnection();
@@ -78,13 +67,17 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     peerConnection.ontrack = event => {
-      // Pokud je první video stream přijat
-      if (!remoteVideo1.srcObject) {
-        remoteVideo1.srcObject = event.streams[0];
-        videoWrapper2.style.display = 'flex';
-      } else if (!remoteVideo2.srcObject) {
-        remoteVideo2.srcObject = event.streams[0];
-        videoWrapper3.style.display = 'flex';
+      // Zobrazení video streamu
+      let remoteVideoElement;
+      for (let i = 0; i < remoteVideos.length; i++) {
+        if (!remoteVideos[i].srcObject) {
+          remoteVideoElement = remoteVideos[i];
+          break;
+        }
+      }
+      if (remoteVideoElement) {
+        remoteVideoElement.srcObject = event.streams[0];
+        videoWrapper2.style.display = 'flex'; // Zobrazení video wrapperu pro další zařízení
       }
     };
 
