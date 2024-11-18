@@ -9,9 +9,10 @@ document.addEventListener('DOMContentLoaded', function () {
   
   let localStream;
   let peerConnections = {};
- const socket = new WebSocket('ws://puffy-mercury-circle.glitch.me');
- // Upravte URL na vconst socket = new WebSocket('ws://puffy-mercury-circle.glitch.me');
- 
+
+  // Inicializace WebSocket připojení
+  const socket = new WebSocket('wss://puffy-mercury-circle.glitch.me'); // Změněno na "wss" pro bezpečnější spojení
+
   // Připojení na WebSocket server
   socket.onopen = () => {
     console.log('Připojeno k WebSocket serveru');

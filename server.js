@@ -6,8 +6,8 @@ const WebSocket = require('ws');
 const app = express();
 const server = http.createServer(app);
 
-// Inicializace WebSocket serveru
-const wss = new WebSocket.Server({ port: 3000 });
+// Inicializace WebSocket serveru na stejném portu jako HTTP server
+const wss = new WebSocket.Server({ server });
 let clients = {}; // Ukládání připojených klientů
 
 // Obsluha připojení WebSocket klientů
@@ -15,7 +15,7 @@ wss.on('connection', (ws) => {
   const userId = generateUniqueId();
   clients[userId] = ws;
 
-   console.log('Nový uživatel připojen');
+  console.log('Nový uživatel připojen: ', userId);
 
   // Odeslání zprávy o počtu připojených uživatelů všem klientům
   broadcastUserCount();
@@ -23,11 +23,12 @@ wss.on('connection', (ws) => {
   // Příjem zpráv od klienta
   ws.on('message', message => {
     console.log('Přijato zprávu: %s', message);
-    // Zde přeposíláme zprávu všem připojeným klientům
-    wss.clients.forEach(client => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
+    const parsedMessage = JSON.parse(message);
+
+    // Předávání zpráv dle typu všem klientům
+    if (parsedMessage.type === 'offer' || parsedMessage.type === 'answer' || parsedMessage.type === 'candidate') {
+      forwardMessageToClients(parsedMessage, userId);
+    }
   });
 
   // Odstranění uživatele při odpojení
@@ -49,7 +50,18 @@ function broadcastUserCount() {
   const message = JSON.stringify({ type: 'userCount', count: userCount });
 
   Object.values(clients).forEach((client) => {
-    client.send(message);
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(message);
+    }
+  });
+}
+
+// Funkce pro předání zprávy dalším klientům
+function forwardMessageToClients(parsedMessage, senderId) {
+  Object.entries(clients).forEach(([userId, client]) => {
+    if (userId !== senderId && client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({ ...parsedMessage, userId: senderId }));
+    }
   });
 }
 
@@ -57,7 +69,7 @@ function broadcastUserCount() {
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Port nastavení
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server běží na portu ${PORT}`);
 });
