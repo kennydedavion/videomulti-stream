@@ -15,14 +15,14 @@ wss.on('connection', (ws) => {
 
   console.log('Nový uživatel připojen', userId);
 
-  // Odeslání počtu připojených uživatelů všem klientům
+  // Odesílání počtu připojených uživatelů všem klientům
   broadcastUserCount();
 
   // Přijímání zpráv od klienta
-  ws.on('message', message => {
+  ws.on('message', (message) => {
     console.log('Přijato zprávu: %s', message);
     // Přeposíláme zprávu všem připojeným klientům
-    wss.clients.forEach(client => {
+    wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(message);
       }
@@ -46,7 +46,7 @@ function generateUniqueId() {
 function broadcastUserCount() {
   const userCount = Object.keys(clients).length;
   const message = JSON.stringify({ type: 'userCount', count: userCount });
-  wss.clients.forEach(client => {
+  wss.clients.forEach((client) => {
     client.send(message);
   });
 }
