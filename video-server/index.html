@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nový Video Server</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #videoContainer {
+      display: flex;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    video {
+      width: 200px;
+      height: 150px;
+      margin: 10px;
+    }
+
+    #userCount {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Nový Video Server</h1>
+  <div id="videoContainer"></div>
+  <div id="userCount">Uživatelé: 0</div>
+  <script src="video-server/script.js"></script>
+</body>
+</html>
