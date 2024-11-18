@@ -14,7 +14,8 @@
   "description": "Jiny Vesmir - Misto pro vedome",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "video-server": "node video-server/server.js"
   },
   "engines": {
     "node": "14.x"
