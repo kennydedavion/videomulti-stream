@@ -22,12 +22,15 @@ wss.on('connection', (ws) => {
 
   // Příjem zpráv od klienta
   ws.on('message', message => {
-    console.log('Přijato zprávu: %s', message);
-    const parsedMessage = JSON.parse(message);
+    try {
+      const parsedMessage = JSON.parse(message);
 
-    // Předávání zpráv dle typu všem klientům
-    if (parsedMessage.type === 'offer' || parsedMessage.type === 'answer' || parsedMessage.type === 'candidate') {
-      forwardMessageToClients(parsedMessage, userId);
+      // Řízení zpráv na základě typu
+      if (parsedMessage.type === 'offer' || parsedMessage.type === 'answer' || parsedMessage.type === 'candidate') {
+        forwardMessageToClients(parsedMessage, userId);
+      }
+    } catch (error) {
+      console.error('Chyba při zpracování zprávy:', error);
     }
   });
 
