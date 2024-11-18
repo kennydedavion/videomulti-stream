@@ -6,7 +6,7 @@ const WebSocket = require('ws');
 const app = express();
 const server = http.createServer(app);
 
-// Inicializace WebSocket serveru na stejném portu jako HTTP server
+// Inicializace WebSocket serveru
 const wss = new WebSocket.Server({ server });
 let clients = {}; // Ukládání připojených klientů
 
@@ -15,29 +15,25 @@ wss.on('connection', (ws) => {
   const userId = generateUniqueId();
   clients[userId] = ws;
 
-  console.log('Nový uživatel připojen: ', userId);
-
-  // Odeslání zprávy o počtu připojených uživatelů všem klientům
+  // Odeslání zprávy o počtu připojených uživatelů
   broadcastUserCount();
+
+  // Záznam připojení uživatele
+  broadcastLog(`Nový uživatel připojen: ${userId}`);
 
   // Příjem zpráv od klienta
   ws.on('message', message => {
-    try {
-      const parsedMessage = JSON.parse(message);
-
-      // Řízení zpráv na základě typu
-      if (parsedMessage.type === 'offer' || parsedMessage.type === 'answer' || parsedMessage.type === 'candidate') {
-        forwardMessageToClients(parsedMessage, userId);
-      }
-    } catch (error) {
-      console.error('Chyba při zpracování zprávy:', error);
+    const data = JSON.parse(message);
+    if (data.type === 'join') {
+      // Oznámit připojení
+      broadcastLog(`Uživatel ${userId} připojen`);
     }
   });
 
   // Odstranění uživatele při odpojení
   ws.on('close', () => {
-    console.log(`Uživatel ${userId} se odpojil`);
     delete clients[userId];
+    broadcastLog(`Uživatel ${userId} se odpojil`);
     broadcastUserCount();
   });
 });
@@ -53,18 +49,16 @@ function broadcastUserCount() {
   const message = JSON.stringify({ type: 'userCount', count: userCount });
 
   Object.values(clients).forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(message);
-    }
+    client.send(message);
   });
 }
 
-// Funkce pro předání zprávy dalším klientům
-function forwardMessageToClients(parsedMessage, senderId) {
-  Object.entries(clients).forEach(([userId, client]) => {
-    if (userId !== senderId && client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify({ ...parsedMessage, userId: senderId }));
-    }
+// Funkce pro odesílání logu všem klientům
+function broadcastLog(message) {
+  const logMessage = JSON.stringify({ type: 'log', message: message });
+
+  Object.values(clients).forEach((client) => {
+    client.send(logMessage);
   });
 }
 
@@ -72,7 +66,7 @@ function forwardMessageToClients(parsedMessage, senderId) {
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Port nastavení
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`Server běží na portu ${PORT}`);
 });

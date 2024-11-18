@@ -1,86 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>A-Frame AR s WebRTC</title>
-  <!-- Zahrň A-Frame knihovnu -->
-  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  
-  <!-- Zahrň vlastní JavaScript soubory -->
-  <script src="/script.js" defer></script>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Chat</title>
   <style>
-    body, html {
+    body {
       margin: 0;
       padding: 0;
-      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      height: 100vh;
+      background-color: #f0f0f0;
       font-family: Arial, sans-serif;
+      overflow: hidden;
     }
+
     .video-container {
       display: flex;
-      justify-content: space-around;
-      align-items: center;
-      position: absolute;
-      top: 50px;
-      left: 50px;
-      right: 50px;
-      z-index: 1;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: flex-start;
+      margin-top: 20px;
+      gap: 0;
+      overflow: hidden;
     }
-    .video-wrapper {
-      display: none; /* Skryté, dokud se uživatel nepřipojí */
-      flex-direction: column;
-      align-items: center;
-      max-width: 20%;
-      transition: transform 0.3s ease;
-    }
+
     video {
-      width: 100%;
-      height: auto;
-      border: 2px solid #ccc;
+      width: 300px;
+      height: 200px;
+      border: 2px solid #000;
+      display: none;
     }
-    
-    /* A-Frame nastavení */
-    a-scene {
+
+    #userCount {
+      font-size: 20px;
+      margin-top: 20px;
+      margin-left: 20px;
+    }
+
+    #arVrButton {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #log {
+      margin-top: 20px;
+      max-height: 200px;
+      overflow-y: scroll;
+      width: 80%;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      padding: 10px;
+      font-family: monospace;
+    }
+
+    #vrContainer {
+      width: 100%;
+      height: 100%;
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
-    /* Počet uživatelů */
-    .user-count {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background-color: rgba(0, 0, 0, 0.5);
-      color: #fff;
-      padding: 10px;
-      border-radius: 5px;
-      font-size: 16px;
-      z-index: 10;
+    .vr-box {
+      width: 300px;
+      height: 300px;
+      background-color: blue;
     }
+
   </style>
 </head>
 <body>
-  <div class="user-count" id="userCount">Počet uživatelů: 0</div>
-  
-  <div class="video-container">
-    <div id="videoWrapper1" class="video-wrapper">
-      <video id="localVideo" autoplay muted></video>
-    </div>
-    <div id="videoWrapper2" class="video-wrapper">
-      <video id="remoteVideo1" autoplay></video>
-    </div>
-    <div id="videoWrapper3" class="video-wrapper">
-      <video id="remoteVideo2" autoplay></video>
-    </div>
+
+  <div class="video-container" id="videoContainer">
+    <video id="localVideo" autoplay muted></video>
   </div>
-  
-  <!-- A-Frame VR/AR scena -->
-  <a-scene>
-    <a-box position="0 1 -5" color="blue"></a-box>
-    <a-camera look-controls="enabled: true; pointerLockEnabled: true;"></a-camera>
-  </a-scene>
+
+  <div id="userCount">Počet uživatelů: 0</div>
+
+  <button id="arVrButton">Přepnout AR/VR</button>
+
+  <div id="vrContainer" style="display: none;">
+    <div class="vr-box"></div>
+  </div>
+
+  <div id="log"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/peerjs@1.4.3/dist/peerjs.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
