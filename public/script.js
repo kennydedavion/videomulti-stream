@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
   
   let localStream;
   let peerConnections = {};
-  const socket = new WebSocket(`ws://${window.location.host}`);
+ const socket = new WebSocket(`wss://${window.location.host}`);
 
   socket.onopen = () => {
     console.log('Připojeno k WebSocket serveru');
