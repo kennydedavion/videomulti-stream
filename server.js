@@ -52,7 +52,7 @@ wss.on('connection', (ws) => {
     }
 
     if (data.type === 'candidate') {
-      // Poslat kandidáty (ICE candidates) ostatním uživatelům
+      // Poslat kandidáta (candidate) ostatním uživatelům
       Object.keys(clients).forEach((clientId) => {
         if (clientId !== userId) {
           clients[clientId].send(JSON.stringify({

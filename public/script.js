@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
   const localVideo = document.getElementById('localVideo');
-  const videoWrapper1 = document.getElementById('videoWrapper1');
-  const videoWrapper2 = document.getElementById('videoWrapper2');
-  const videoWrapper3 = document.getElementById('videoWrapper3');
-  const remoteVideos = [document.getElementById('remoteVideo1'), document.getElementById('remoteVideo2')];
+  const remoteVideos = [
+    document.getElementById('remoteVideo1'),
+    document.getElementById('remoteVideo2')
+  ];
   const userCountElement = document.getElementById('userCount');
   
   let localStream;
@@ -44,7 +44,6 @@ document.addEventListener('DOMContentLoaded', function () {
   navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
     localVideo.srcObject = stream;
     localStream = stream;
-    videoWrapper1.style.display = 'flex';
 
     // Připojení k serveru
     socket.send(JSON.stringify({ type: 'join' }));
@@ -67,7 +66,6 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     peerConnection.ontrack = event => {
-      // Zobrazení video streamu
       let remoteVideoElement;
       for (let i = 0; i < remoteVideos.length; i++) {
         if (!remoteVideos[i].srcObject) {
@@ -77,7 +75,6 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       if (remoteVideoElement) {
         remoteVideoElement.srcObject = event.streams[0];
-        videoWrapper2.style.display = 'flex'; // Zobrazení video wrapperu pro další zařízení
       }
     };
 
