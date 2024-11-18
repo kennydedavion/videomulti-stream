@@ -3,39 +3,88 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Testovací stránka s WebSocket</title>
+  <title>WebSocket Test</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      flex-direction: column;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    #log {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #eee;
+      border: 1px solid #ccc;
+      height: 150px;
+      overflow-y: auto;
+      font-size: 12px;
+      white-space: nowrap;
+      width: 100%;
     }
     #userCount {
-      font-size: 20px;
-      margin-bottom: 10px;
+      margin-top: 20px;
+      font-size: 18px;
     }
-    #userList {
-      list-style-type: none;
-      padding: 0;
-    }
-    #userList li {
-      padding: 8px;
-      margin: 4px;
-      background-color: #f4f4f4;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+    .user-info {
+      font-weight: bold;
+      color: green;
     }
   </style>
 </head>
 <body>
-  <div id="userCount">Počet připojených uživatelů: 0</div>
-  <ul id="userList"></ul>
-  
-  <script src="script.js"></script>
+
+<h1>WebSocket User Log</h1>
+<div id="userCount">Počet připojených uživatelů: 0</div>
+
+<!-- Log area to display connection/disconnection messages -->
+<div id="log"></div>
+
+<!-- Adding WebSocket functionality -->
+<script>
+  const logElement = document.getElementById('log');
+  const userCountElement = document.getElementById('userCount');
+
+  const ws = new WebSocket('ws://localhost:3000'); // Adjust to 'wss' if using HTTPS
+
+  // Handle when the connection is established
+  ws.onopen = () => {
+    logMessage('Připojeno k serveru');
+  };
+
+  // Handle incoming messages
+  ws.onmessage = (event) => {
+    const message = JSON.parse(event.data);
+
+    // Log the message
+    logMessage(`Přijata zpráva: ${JSON.stringify(message)}`);
+
+    // If it's a user count update, display it
+    if (message.type === 'userCount') {
+      userCountElement.innerText = `Počet připojených uživatelů: ${message.count}`;
+    }
+  };
+
+  // Handle connection close
+  ws.onclose = () => {
+    logMessage('Odpojeno od serveru');
+  };
+
+  // Function to log messages to the log area
+  function logMessage(msg) {
+    const timestamp = new Date().toLocaleTimeString();
+    logElement.innerText = `${timestamp}: ${msg} \n` + logElement.innerText;
+  }
+
+  // Send a "join" message when the user connects
+  ws.onopen = () => {
+    ws.send(JSON.stringify({ type: 'join', userId: generateUniqueId() }));
+  };
+
+  // Function to generate a unique ID for the user
+  function generateUniqueId() {
+    return Math.random().toString(36).substr(2, 9);
+  }
+</script>
+
 </body>
 </html>

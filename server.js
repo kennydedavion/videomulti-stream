@@ -1,4 +1,17 @@
-// WebSocket server
+const express = require('express');
+const http = require('http');
+const WebSocket = require('ws');
+const path = require('path');
+
+const app = express();
+const server = http.createServer(app);
+
+// Inicializace WebSocket serveru
+const wss = new WebSocket.Server({ server }); // Používáme server pro WebSocket server
+
+let clients = {}; // Ukládání připojených klientů
+
+// Obsluha připojení WebSocket klientů
 wss.on('connection', (ws) => {
   const userId = generateUniqueId();
   clients[userId] = ws;
@@ -9,11 +22,10 @@ wss.on('connection', (ws) => {
   broadcastUserCount();
 
   // Příjem zpráv od klienta
-  ws.on('message', (message) => {
+  ws.on('message', message => {
     console.log('Přijato zprávu: %s', message);
-
     // Zde přeposíláme zprávu všem připojeným klientům
-    wss.clients.forEach((client) => {
+    wss.clients.forEach(client => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(message);
       }
@@ -28,6 +40,11 @@ wss.on('connection', (ws) => {
   });
 });
 
+// Funkce pro vytvoření unikátního ID uživatele
+function generateUniqueId() {
+  return Math.random().toString(36).substr(2, 9);
+}
+
 // Funkce pro rozesílání počtu uživatelů všem klientům
 function broadcastUserCount() {
   const userCount = Object.keys(clients).length;
@@ -38,3 +55,12 @@ function broadcastUserCount() {
     client.send(message);
   });
 }
+
+// Servírování statických souborů z public složky
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Port nastavení
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Server běží na portu ${PORT}`);
+});
