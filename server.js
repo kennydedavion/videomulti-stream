@@ -25,15 +25,13 @@ wss.on('connection', (ws) => {
   ws.on('message', message => {
     const data = JSON.parse(message);
     if (data.type === 'join') {
-      // Odeslání zprávy pro všechny ostatní
+      // Oznámit připojení
       broadcastLog(`Uživatel ${userId} připojen`);
-      broadcastUserCount();
     }
   });
 
   // Odstranění uživatele při odpojení
   ws.on('close', () => {
-    console.log(`Uživatel ${userId} se odpojil`);
     delete clients[userId];
     broadcastLog(`Uživatel ${userId} se odpojil`);
     broadcastUserCount();

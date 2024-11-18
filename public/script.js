@@ -3,9 +3,12 @@ document.addEventListener('DOMContentLoaded', function () {
   const videoContainer = document.getElementById('videoContainer');
   const userCountElement = document.getElementById('userCount');
   const logElement = document.getElementById('log');
-  
+  const arVrButton = document.getElementById('arVrButton');
+  const vrContainer = document.getElementById('vrContainer');
+  const peer = new Peer();
+
   let localStream;
-  let peerConnections = {};  // Uložení všech peer připojení
+  let peerConnections = {};
   const socket = new WebSocket(`wss://${window.location.host}`);
 
   // Připojení na WebSocket server
@@ -17,12 +20,10 @@ document.addEventListener('DOMContentLoaded', function () {
   socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
 
-    // Logování zpráv (připojení, odpojení, atd.)
     if (data.type === 'userCount') {
       userCountElement.textContent = `Počet uživatelů: ${data.count}`;
     }
 
-    // Přidání logu
     if (data.type === 'join') {
       logElement.innerHTML += `<p>Nový uživatel připojen: ${data.userId}</p>`;
     }
@@ -31,17 +32,14 @@ document.addEventListener('DOMContentLoaded', function () {
       logElement.innerHTML += `<p>Uživatel ${data.userId} se odpojil</p>`;
     }
 
-    // Zpracování nabídky (offer) od jiného uživatele
     if (data.type === 'offer' && !peerConnections[data.userId]) {
       handleOffer(data.offer, data.userId);
     }
 
-    // Zpracování odpovědi (answer)
     if (data.type === 'answer' && peerConnections[data.userId]) {
       peerConnections[data.userId].setRemoteDescription(new RTCSessionDescription(data.answer));
     }
 
-    // Přidání kandidáta (ICE candidate)
     if (data.type === 'candidate' && peerConnections[data.userId]) {
       peerConnections[data.userId].addIceCandidate(new RTCIceCandidate(data.candidate));
     }
@@ -51,8 +49,6 @@ document.addEventListener('DOMContentLoaded', function () {
   navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
     localVideo.srcObject = stream;
     localStream = stream;
-
-    // Připojení k serveru
     socket.send(JSON.stringify({ type: 'join', userId: generateUniqueId() }));
   }).catch(err => {
     console.error('Nepodařilo se získat místní stream:', err);
@@ -73,22 +69,14 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     peerConnection.ontrack = event => {
-      let remoteVideoElement;
-      // Hledáme první volný video frame
-      const allVideos = document.querySelectorAll('video');
-      for (let i = 1; i < allVideos.length; i++) {
-        if (!allVideos[i].srcObject) {
-          remoteVideoElement = allVideos[i];
-          break;
-        }
-      }
-      if (remoteVideoElement) {
-        remoteVideoElement.srcObject = event.streams[0];
-        remoteVideoElement.style.display = 'block';  // Ukázání videa
-      }
+      let remoteVideoElement = document.createElement('video');
+      remoteVideoElement.srcObject = event.streams[0];
+      remoteVideoElement.style.display = 'block';
+      remoteVideoElement.setAttribute('autoplay', true);
+      remoteVideoElement.setAttribute('muted', true);
+      videoContainer.appendChild(remoteVideoElement);
     };
 
-    // Přidání místního streamu k připojení
     localStream.getTracks().forEach(track => {
       peerConnection.addTrack(track, localStream);
     });
@@ -127,4 +115,13 @@ document.addEventListener('DOMContentLoaded', function () {
     return Math.random().toString(36).substr(2, 9);
   }
 
+  // Přepnutí AR/VR režimu
+  arVrButton.addEventListener('click', function() {
+    const isVrVisible = vrContainer.style.display === 'flex';
+    if (isVrVisible) {
+      vrContainer.style.display = 'none';
+    } else {
+      vrContainer.style.display = 'flex';
+    }
+  });
 });
