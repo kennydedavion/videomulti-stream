@@ -1,11 +1,13 @@
 {
   "dependencies": {
+    "17": "0.0.0",
     "@fastify/formbody": "^8.0.1",
     "@fastify/static": "^8.0.2",
     "@fastify/view": "^10.0.1",
-    "express": "^5.0.1",
+    "express": "^4.21.1",
     "fastify": "^5.1.0",
     "handlebars": "^4.7.8",
+    "merge-descriptors": "^1.0.3",
     "socket.io": "^4.8.1",
     "ws": "^8.18.0"
   },
@@ -14,11 +16,10 @@
   "description": "Jiny Vesmir - Misto pro vedome",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "video-server": "node video-server/server.js"
+    "start": "node server.js"
   },
   "engines": {
-    "node": "16.x"
+    "node": "14.x"
   },
   "repository": {
     "url": "https://jinyvesmir.glitch.me/"
@@ -28,5 +29,6 @@
   "keywords": [
     "node",
     "glitch"
-  ]
+  ],
+  "devDependencies": {}
 }
