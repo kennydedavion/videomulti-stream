@@ -1,90 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WebSocket Test</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #f4f4f4;
-    }
-    #log {
-      margin-top: 20px;
-      padding: 10px;
-      background-color: #eee;
-      border: 1px solid #ccc;
-      height: 150px;
-      overflow-y: auto;
-      font-size: 12px;
-      white-space: nowrap;
-      width: 100%;
-    }
-    #userCount {
-      margin-top: 20px;
-      font-size: 18px;
-    }
-    .user-info {
-      font-weight: bold;
-      color: green;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Konference</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<h1>WebSocket User Log</h1>
-<div id="userCount">Počet připojených uživatelů: 0</div>
-
-<!-- Log area to display connection/disconnection messages -->
-<div id="log"></div>
-
-<!-- Adding WebSocket functionality -->
-<script>
-  const logElement = document.getElementById('log');
-  const userCountElement = document.getElementById('userCount');
-
-  const ws = new WebSocket('ws://localhost:3000'); // Adjust to 'wss' if using HTTPS
-
-  // Handle when the connection is established
-  ws.onopen = () => {
-    logMessage('Připojeno k serveru');
-  };
-
-  // Handle incoming messages
-  ws.onmessage = (event) => {
-    const message = JSON.parse(event.data);
-
-    // Log the message
-    logMessage(`Přijata zpráva: ${JSON.stringify(message)}`);
-
-    // If it's a user count update, display it
-    if (message.type === 'userCount') {
-      userCountElement.innerText = `Počet připojených uživatelů: ${message.count}`;
-    }
-  };
-
-  // Handle connection close
-  ws.onclose = () => {
-    logMessage('Odpojeno od serveru');
-  };
-
-  // Function to log messages to the log area
-  function logMessage(msg) {
-    const timestamp = new Date().toLocaleTimeString();
-    logElement.innerText = `${timestamp}: ${msg} \n` + logElement.innerText;
-  }
-
-  // Send a "join" message when the user connects
-  ws.onopen = () => {
-    ws.send(JSON.stringify({ type: 'join', userId: generateUniqueId() }));
-  };
-
-  // Function to generate a unique ID for the user
-  function generateUniqueId() {
-    return Math.random().toString(36).substr(2, 9);
-  }
-</script>
-
+    <h1>Počet připojených uživatelů: <span id="user-count">0</span></h1>
+    <video id="local-video" autoplay muted></video>
+    <video id="remote-video" autoplay></video>
+    <script src="https://cdn.webrtc.org/adapter/adapter-latest.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

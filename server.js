@@ -1,66 +1,39 @@
 const express = require('express');
-const http = require('http');
 const WebSocket = require('ws');
-const path = require('path');
+const http = require('http');
+const socketIo = require('socket.io');
 
+// Inicializace serveru
 const app = express();
 const server = http.createServer(app);
+const io = socketIo(server);
 
-// Inicializace WebSocket serveru
-const wss = new WebSocket.Server({ server }); // Používáme server pro WebSocket server
+// Statické soubory
+app.use(express.static('public'));
 
-let clients = {}; // Ukládání připojených klientů
+// WebSocket pro komunikaci mezi klienty
+const wss = new WebSocket.Server({ server });
 
-// Obsluha připojení WebSocket klientů
+// Počet připojených uživatelů
+let users = 0;
+
+// WebSocket - nová připojení
 wss.on('connection', (ws) => {
-  const userId = generateUniqueId();
-  clients[userId] = ws;
-
-  console.log('Nový uživatel připojen');
-
-  // Odeslání zprávy o počtu připojených uživatelů všem klientům
-  broadcastUserCount();
-
-  // Příjem zpráv od klienta
-  ws.on('message', message => {
-    console.log('Přijato zprávu: %s', message);
-    // Zde přeposíláme zprávu všem připojeným klientům
-    wss.clients.forEach(client => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
-    });
+  users++;
+  // Informování všech klientů o počtu uživatelů
+  wss.clients.forEach(client => {
+    client.send(JSON.stringify({ type: 'user_count', users }));
   });
 
-  // Odstranění uživatele při odpojení
   ws.on('close', () => {
-    console.log(`Uživatel ${userId} se odpojil`);
-    delete clients[userId];
-    broadcastUserCount();
+    users--;
+    wss.clients.forEach(client => {
+      client.send(JSON.stringify({ type: 'user_count', users }));
+    });
   });
 });
 
-// Funkce pro vytvoření unikátního ID uživatele
-function generateUniqueId() {
-  return Math.random().toString(36).substr(2, 9);
-}
-
-// Funkce pro rozesílání počtu uživatelů všem klientům
-function broadcastUserCount() {
-  const userCount = Object.keys(clients).length;
-  const message = JSON.stringify({ type: 'userCount', count: userCount });
-
-  // Zasíláme počet uživatelů každému připojenému klientovi
-  Object.values(clients).forEach((client) => {
-    client.send(message);
-  });
-}
-
-// Servírování statických souborů z public složky
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Port nastavení
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Server běží na portu ${PORT}`);
+// Spuštění serveru na portu 3000
+server.listen(3000, () => {
+  console.log('Server běží na portu 3000');
 });
