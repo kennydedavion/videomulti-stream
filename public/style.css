@@ -12,8 +12,9 @@ body {
   top: 10px;
   right: 10px;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap; /* Flexibilní uspořádání */
   gap: 10px;
+  justify-content: center;
 }
 
 #localVideo {
@@ -26,8 +27,9 @@ body {
 
 #remoteVideos {
   display: flex;
-  flex-direction: row;
+  flex-wrap: wrap;
   gap: 10px;
+  justify-content: center;
 }
 
 video {
@@ -36,4 +38,10 @@ video {
   height: 240px;
   background-color: #000;
   object-fit: cover;
+}
+
+p {
+  color: white;
+  font-size: 12px;
+  margin: 5px;
 }

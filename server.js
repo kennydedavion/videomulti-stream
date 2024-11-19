@@ -1,34 +1,18 @@
-const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
-const path = require('path');
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ port: 8080 });
 
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
-
-app.use(express.static(path.join(__dirname, 'public')));
-
-io.on('connection', (socket) => {
-  console.log('New connection established: ' + socket.id);
-
-  // Odeslání nabídky (offer) ostatním uživatelům
-  socket.on('offer', (offer) => {
-    socket.broadcast.emit('offer', offer);
+wss.on('connection', (ws) => {
+  ws.on('message', (message) => {
+    const msg = JSON.parse(message);
+    // Procházení všech připojených klientů a posílání zpráv
+    wss.clients.forEach(client => {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify(msg));
+      }
+    });
   });
 
-  // Odeslání odpovědi (answer) ostatním uživatelům
-  socket.on('answer', (answer) => {
-    socket.broadcast.emit('answer', answer);
-  });
-
-  // Odeslání ICE kandidátů ostatním uživatelům
-  socket.on('candidate', (candidate) => {
-    socket.broadcast.emit('candidate', candidate);
-  });
+  ws.send(JSON.stringify({ type: 'welcome', message: 'Welcome to the video chat server!' }));
 });
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Server běží na portu ${PORT}`);
-});
+console.log('Server běží na ws://localhost:8080');
