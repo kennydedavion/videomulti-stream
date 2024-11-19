@@ -3,38 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Konference</title>
+    <title>Videohovory s PeerJS, WebRTC a Firebase</title>
+    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.4.3/dist/peerjs.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.5.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.5.0/firebase-database.js"></script>
     <style>
-        #video-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
         }
-        .video-wrapper {
-            position: relative;
-            width: 300px;
-            height: 200px;
-            background: black;
+        .row {
+            margin-bottom: 20px;
         }
         video {
-            width: 100%;
-            height: 100%;
+            width: 300px;
+            height: 200px;
+            margin: 10px;
         }
-        .user-id {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            color: white;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 5px;
+        #local-video {
+            border: 2px solid #000;
+        }
+        .video-wrapper {
+            display: flex;
         }
     </style>
 </head>
 <body>
-    <div id="video-container"></div>
-    <div id="connection-log"></div>
-    <script src="https://cdn.jsdelivr.net/npm/uuid@8.3.2/dist/umd/uuid.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/simple-peer@9.11.0/simple-peer.min.js"></script>
-    <script src="/script.js"></script>
+
+    <!-- PeerJS Section -->
+    <div class="row">
+        <h2>PeerJS Video Call</h2>
+        <div id="peerjs-video" class="video-wrapper">
+            <video id="local-video" autoplay muted></video>
+        </div>
+    </div>
+
+    <!-- WebRTC API Section -->
+    <div class="row">
+        <h2>WebRTC API Video Call</h2>
+        <div id="webrtc-video" class="video-wrapper">
+            <video id="webrtc-local-video" autoplay muted></video>
+        </div>
+    </div>
+
+    <!-- Firebase WebRTC Signaling Section -->
+    <div class="row">
+        <h2>WebRTC Signaling with Firebase</h2>
+        <div id="firebase-video" class="video-wrapper">
+            <video id="firebase-local-video" autoplay muted></video>
+        </div>
+    </div>
+
+    <script>
+        // PeerJS setup
+        const peer = new Peer();
+        const peerVideo = document.getElementById('local-video');
+
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .then(stream => {
+                peerVideo.srcObject = stream;
+                peer.on('call', call => {
+                    call.answer(stream); // Answer with local stream
+                    call.on('stream', remoteStream => {
+                        const remoteVideo = document.createElement('video');
+                        remoteVideo.srcObject = remoteStream;
+                        remoteVideo.autoplay = true;
+                        document.getElementById('peerjs-video').appendChild(remoteVideo);
+                    });
+                });
+            });
+
+        peer.on('open', id => {
+            console.log('My peer ID is ' + id);
+            // When another user connects, initiate a call
+            // Example: peer.call('another-peer-id', localStream);
+        });
+
+        // WebRTC API setup
+        const webrtcPeerConnection = new RTCPeerConnection();
+        const webrtcLocalVideo = document.getElementById('webrtc-local-video');
+
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .then(stream => {
+                webrtcLocalVideo.srcObject = stream;
+                stream.getTracks().forEach(track => webrtcPeerConnection.addTrack(track, stream));
+
+                webrtcPeerConnection.ontrack = event => {
+                    const remoteStream = event.streams[0];
+                    const remoteVideo = document.createElement('video');
+                    remoteVideo.srcObject = remoteStream;
+                    remoteVideo.autoplay = true;
+                    document.getElementById('webrtc-video').appendChild(remoteVideo);
+                };
+            });
+
+        // Firebase setup for signaling
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const signalingRef = db.ref('signaling');
+
+        signalingRef.on('child_added', snapshot => {
+            const message = snapshot.val();
+            console.log('Signaling message:', message);
+            // Handle message: offer, answer, or ICE candidates
+        });
+
+        // To send signal messages, use:
+        function sendSignalingMessage(message) {
+            signalingRef.push(message);
+        }
+
+    </script>
+
 </body>
 </html>
