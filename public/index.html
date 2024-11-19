@@ -1,16 +1,36 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Konference</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Chat</title>
+  <style>
+    #videoContainer {
+      display: flex;
+    }
+    video {
+      width: 45%;
+      margin: 5px;
+    }
+    #log {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      max-height: 200px;
+      width: 200px;
+      overflow-y: scroll;
+      border: 1px solid black;
+      background-color: white;
+      padding: 10px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Počet připojených uživatelů: <span id="user-count">0</span></h1>
-    <video id="local-video" autoplay muted></video>
-    <video id="remote-video" autoplay></video>
-    <script src="https://cdn.webrtc.org/adapter/adapter-latest.js"></script>
-    <script src="script.js"></script>
+  <div id="videoContainer">
+    <video id="localVideo" autoplay muted></video>
+    <video id="remoteVideo" autoplay></video>
+  </div>
+  <div id="log"></div>
+  <script src="client.js"></script>
 </body>
 </html>

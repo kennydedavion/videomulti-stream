@@ -1,38 +1,44 @@
 const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
-const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-let connectedUsers = 0;
+let userCount = 0;
+let users = {}; // Pro uložení ID uživatelů a jejich socketů
 
 wss.on('connection', (ws) => {
-  connectedUsers++;
-  console.log(`Nový uživatel připojen, aktuální počet: ${connectedUsers}`);
-  
-  // Informace o počtu připojených uživatelů
-  wss.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify({ type: 'updateUsers', count: connectedUsers }));
+  userCount++;
+  const userId = `User_${userCount}`;
+  users[userId] = ws;
+
+  // Oznámí všem uživatelům, že se někdo připojil
+  Object.values(users).forEach(userWs => {
+    userWs.send(JSON.stringify({ type: 'user-joined', userId }));
+  });
+
+  ws.on('message', (message) => {
+    // Předá zprávu ostatním uživatelům
+    const data = JSON.parse(message);
+    if (data.type === 'video-offer') {
+      Object.values(users).forEach(userWs => {
+        if (userWs !== ws) {
+          userWs.send(JSON.stringify(data));
+        }
+      });
     }
   });
 
   ws.on('close', () => {
-    connectedUsers--;
-    console.log(`Uživatel odpojen, aktuální počet: ${connectedUsers}`);
-    wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({ type: 'updateUsers', count: connectedUsers }));
-      }
-    });
+    // Odstranění uživatele při odpojení
+    delete users[userId];
   });
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 
-server.listen(3000, () => {
-  console.log('Server běží na portu 3000');
+server.listen(process.env.PORT || 3000, () => {
+  console.log('Server is running...');
 });
