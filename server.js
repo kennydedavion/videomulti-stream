@@ -1,39 +1,38 @@
 const express = require('express');
-const WebSocket = require('ws');
 const http = require('http');
-const socketIo = require('socket.io');
+const WebSocket = require('ws');
+const path = require('path');
 
-// Inicializace serveru
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
-
-// Statické soubory
-app.use(express.static('public'));
-
-// WebSocket pro komunikaci mezi klienty
 const wss = new WebSocket.Server({ server });
 
-// Počet připojených uživatelů
-let users = 0;
+let connectedUsers = 0;
 
-// WebSocket - nová připojení
 wss.on('connection', (ws) => {
-  users++;
-  // Informování všech klientů o počtu uživatelů
-  wss.clients.forEach(client => {
-    client.send(JSON.stringify({ type: 'user_count', users }));
+  connectedUsers++;
+  console.log(`Nový uživatel připojen, aktuální počet: ${connectedUsers}`);
+  
+  // Informace o počtu připojených uživatelů
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({ type: 'updateUsers', count: connectedUsers }));
+    }
   });
 
   ws.on('close', () => {
-    users--;
-    wss.clients.forEach(client => {
-      client.send(JSON.stringify({ type: 'user_count', users }));
+    connectedUsers--;
+    console.log(`Uživatel odpojen, aktuální počet: ${connectedUsers}`);
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ type: 'updateUsers', count: connectedUsers }));
+      }
     });
   });
 });
 
-// Spuštění serveru na portu 3000
+app.use(express.static(path.join(__dirname, 'public')));
+
 server.listen(3000, () => {
   console.log('Server běží na portu 3000');
 });
