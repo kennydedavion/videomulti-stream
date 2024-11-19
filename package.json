@@ -3,12 +3,12 @@
     "@fastify/formbody": "^8.0.1",
     "@fastify/static": "^8.0.2",
     "@fastify/view": "^10.0.1",
-    "express": "^5.0.1",
+    "express": "^4.21.1",
     "fastify": "^5.1.0",
     "handlebars": "^4.7.8",
     "merge-descriptors": "^2.0.0",
-    "socket.io": "^4.8.1",
     "simple-peer": "^9.11.1",
+    "socket.io": "^4.8.1",
     "uuid": "^11.0.3",
     "ws": "^8.18.0"
   },
@@ -26,7 +26,7 @@
     "url": "https://jinyvesmir.glitch.me/"
   },
   "author": "Kenny",
-  "license": "MISC",
+  "license": "MIT",
   "keywords": [
     "node",
     "glitch"
