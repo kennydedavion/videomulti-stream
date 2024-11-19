@@ -1,51 +1,52 @@
 document.addEventListener('DOMContentLoaded', () => {
     const videoContainer = document.getElementById('video-container');
-    const userList = document.getElementById('user-list');
-    const switchModeButton = document.getElementById('switch-mode');
-    const currentMode = document.getElementById('current-mode');
-
     const socket = io();
     const peers = {};  // Pro sledování připojených uživatelů a jejich streamů
     let localStream;
-
-    // Přepnutí režimu mezi Video Call a AR/VR
-    switchModeButton.addEventListener('click', () => {
-        if (currentMode.textContent === 'Video Call') {
-            currentMode.textContent = 'AR/VR Mode';
-        } else {
-            currentMode.textContent = 'Video Call';
-        }
-    });
 
     // Přístup k lokálnímu streamu
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
         .then(stream => {
             localStream = stream;
 
-            // Zobrazení lokálního streamu
+            // Vytvoření vlastního video elementu
+            const localVideoWrapper = document.createElement('div');
             const localVideo = document.createElement('video');
+            const localLabel = document.createElement('p');
+            
+            localLabel.textContent = `ID: ${socket.id}`;
             localVideo.setAttribute('autoplay', 'true');
             localVideo.setAttribute('playsinline', 'true');
             localVideo.srcObject = localStream;
-            videoContainer.appendChild(localVideo);
+
+            // Přidání ID nad lokální video
+            localVideoWrapper.appendChild(localLabel);
+            localVideoWrapper.appendChild(localVideo);
+            videoContainer.appendChild(localVideoWrapper);
 
             // Odeslání lokálního streamu po připojení k serveru
             socket.emit('local-stream-ready', socket.id);
         })
         .catch(error => console.error('Error accessing media devices.', error));
 
-    // Přijetí nového uživatele
+    // Přijetí nového uživatele a jeho ID
     socket.on('new-user', (userId) => {
         if (userId !== socket.id && !peers[userId]) {
             // Vytvoření video elementu pro nového uživatele
+            const videoWrapper = document.createElement('div');
             const videoElement = document.createElement('video');
-            videoElement.setAttribute('id', userId);
+            const label = document.createElement('p');
+
+            label.textContent = `ID: ${userId}`;
             videoElement.setAttribute('autoplay', 'true');
             videoElement.setAttribute('playsinline', 'true');
-            videoContainer.appendChild(videoElement);
-            
+
             // Uložení informace o novém uživateli
-            peers[userId] = { videoElement };
+            videoWrapper.appendChild(label);
+            videoWrapper.appendChild(videoElement);
+            videoContainer.appendChild(videoWrapper);
+
+            peers[userId] = { videoElement, label };
         }
     });
 
@@ -59,9 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Zpracování odpojení uživatele
     socket.on('user-disconnected', (userId) => {
         if (peers[userId]) {
-            const videoElement = peers[userId].videoElement;
-            if (videoElement) {
-                videoElement.remove();
+            const videoWrapper = peers[userId].videoElement.parentNode;
+            if (videoWrapper) {
+                videoWrapper.remove();
             }
             delete peers[userId];
         }

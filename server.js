@@ -46,7 +46,8 @@ io.on('connection', (socket) => {
 function broadcastStream(userId) {
     const user = users[userId];
     if (user && user.socket) {
-        user.socket.emit('user-stream', userId, user.socket.localStream);
+        // Odeslání streamu všem ostatním uživatelům
+        io.emit('user-stream', userId, user.socket.localStream);
     }
 }
 
