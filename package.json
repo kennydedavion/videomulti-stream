@@ -20,7 +20,7 @@
     "start": "node server.js"
   },
   "engines": {
-    "node": "17.0.0"
+    "node": "16.x"
   },
   "repository": {
     "url": "https://jinyvesmir.glitch.me/"
