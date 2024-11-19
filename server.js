@@ -1,73 +1,37 @@
-const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: 3000 });
+const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
 
-let connectedUsers = {}; // Skladování připojených uživatelů
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
 
-wss.on('connection', ws => {
-    let userId;
+let users = [];
 
-    ws.on('message', message => {
-        const msg = JSON.parse(message);
-        
-        if (msg.type === 'new-user') {
-            userId = msg.userId;
-            connectedUsers[userId] = ws;
-            console.log(`Nový uživatel připojen: ${userId}`);
-            
-            // Odeslat připojeným uživatelům nové připojení
-            Object.keys(connectedUsers).forEach(id => {
-                if (id !== userId) {
-                    connectedUsers[id].send(JSON.stringify({
-                        type: 'user-connected',
-                        userId: userId
-                    }));
-                }
-            });
-        }
+app.use(express.static('public'));  // Serve static files (e.g., HTML, JS)
 
-        if (msg.type === 'offer') {
-            const { to, offer } = msg;
-            if (connectedUsers[to]) {
-                connectedUsers[to].send(JSON.stringify({
-                    type: 'offer',
-                    userId: userId,
-                    offer: offer
-                }));
-            }
-        }
+io.on('connection', (socket) => {
+    // Generate a unique user ID
+    const userId = socket.id;
+    users.push(userId);
+    console.log(`User connected: ${userId}`);
 
-        if (msg.type === 'answer') {
-            const { to, answer } = msg;
-            if (connectedUsers[to]) {
-                connectedUsers[to].send(JSON.stringify({
-                    type: 'answer',
-                    userId: userId,
-                    answer: answer
-                }));
-            }
-        }
+    // Send new user connection to all clients
+    io.emit('new-user', userId);
 
-        if (msg.type === 'candidate') {
-            const { to, candidate } = msg;
-            if (connectedUsers[to]) {
-                connectedUsers[to].send(JSON.stringify({
-                    type: 'candidate',
-                    userId: userId,
-                    candidate: candidate
-                }));
-            }
-        }
-
-        if (msg.type === 'new-user-stream') {
-            const { userId, stream } = msg;
-            console.log(`Nový stream pro uživatele: ${userId}`);
-        }
+    // Listen for user disconnection
+    socket.on('disconnect', () => {
+        users = users.filter(user => user !== userId);
+        console.log(`User disconnected: ${userId}`);
+        io.emit('user-disconnected', userId);
     });
 
-    ws.on('close', () => {
-        delete connectedUsers[userId];
-        console.log(`Uživatel odpojen: ${userId}`);
+    // Request for user ID (on page load)
+    socket.on('request-user-id', () => {
+        socket.emit('new-user', userId);
     });
 });
 
-console.log('Server běží na portu 3000');
+server.listen(3000, () => {
+    console.log('Server running on http://localhost:3000');
+});

@@ -1,129 +1,67 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Videohovory s PeerJS, WebRTC a Firebase</title>
-    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.4.3/dist/peerjs.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.5.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.5.0/firebase-database.js"></script>
+    <title>Video Chat</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
+        /* Style for user list and video containers */
+        #user-list {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            max-height: 200px;
+            overflow-y: scroll;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 10px;
         }
-        .row {
-            margin-bottom: 20px;
+        #video-container {
+            display: flex;
+            flex-wrap: wrap;
         }
         video {
             width: 300px;
-            height: 200px;
+            height: auto;
             margin: 10px;
-        }
-        #local-video {
-            border: 2px solid #000;
-        }
-        .video-wrapper {
-            display: flex;
         }
     </style>
 </head>
 <body>
-
-    <!-- PeerJS Section -->
-    <div class="row">
-        <h2>PeerJS Video Call</h2>
-        <div id="peerjs-video" class="video-wrapper">
-            <video id="local-video" autoplay muted></video>
-        </div>
-    </div>
-
-    <!-- WebRTC API Section -->
-    <div class="row">
-        <h2>WebRTC API Video Call</h2>
-        <div id="webrtc-video" class="video-wrapper">
-            <video id="webrtc-local-video" autoplay muted></video>
-        </div>
-    </div>
-
-    <!-- Firebase WebRTC Signaling Section -->
-    <div class="row">
-        <h2>WebRTC Signaling with Firebase</h2>
-        <div id="firebase-video" class="video-wrapper">
-            <video id="firebase-local-video" autoplay muted></video>
-        </div>
-    </div>
+    <div id="video-container"></div>
+    <div id="user-list"></div>
 
     <script>
-        // PeerJS setup
-        const peer = new Peer();
-        const peerVideo = document.getElementById('local-video');
+        const videoContainer = document.getElementById('video-container');
+        const userList = document.getElementById('user-list');
 
-        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-            .then(stream => {
-                peerVideo.srcObject = stream;
-                peer.on('call', call => {
-                    call.answer(stream); // Answer with local stream
-                    call.on('stream', remoteStream => {
-                        const remoteVideo = document.createElement('video');
-                        remoteVideo.srcObject = remoteStream;
-                        remoteVideo.autoplay = true;
-                        document.getElementById('peerjs-video').appendChild(remoteVideo);
-                    });
-                });
-            });
+        // Handle new user connection
+        const socket = io();
 
-        peer.on('open', id => {
-            console.log('My peer ID is ' + id);
-            // When another user connects, initiate a call
-            // Example: peer.call('another-peer-id', localStream);
+        socket.on('new-user', (userId) => {
+            // Display new user in the list
+            const userElement = document.createElement('div');
+            userElement.textContent = `User: ${userId}`;
+            userList.appendChild(userElement);
+
+            // Handle the stream for new user
+            const videoElement = document.createElement('video');
+            videoElement.setAttribute('id', userId);
+            videoContainer.appendChild(videoElement);
+
+            // Assuming here we're using WebRTC to handle streams.
+            navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                .then(stream => {
+                    videoElement.srcObject = stream;
+                    videoElement.play();
+                })
+                .catch(error => console.log('Error accessing media devices.', error));
         });
 
-        // WebRTC API setup
-        const webrtcPeerConnection = new RTCPeerConnection();
-        const webrtcLocalVideo = document.getElementById('webrtc-local-video');
-
-        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-            .then(stream => {
-                webrtcLocalVideo.srcObject = stream;
-                stream.getTracks().forEach(track => webrtcPeerConnection.addTrack(track, stream));
-
-                webrtcPeerConnection.ontrack = event => {
-                    const remoteStream = event.streams[0];
-                    const remoteVideo = document.createElement('video');
-                    remoteVideo.srcObject = remoteStream;
-                    remoteVideo.autoplay = true;
-                    document.getElementById('webrtc-video').appendChild(remoteVideo);
-                };
-            });
-
-        // Firebase setup for signaling
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const signalingRef = db.ref('signaling');
-
-        signalingRef.on('child_added', snapshot => {
-            const message = snapshot.val();
-            console.log('Signaling message:', message);
-            // Handle message: offer, answer, or ICE candidates
-        });
-
-        // To send signal messages, use:
-        function sendSignalingMessage(message) {
-            signalingRef.push(message);
-        }
-
+        // Listen for the initial user stream
+        socket.emit('request-user-id');
     </script>
 
+    <script src="/socket.io/socket.io.js"></script>
 </body>
 </html>
