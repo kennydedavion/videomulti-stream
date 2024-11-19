@@ -1,0 +1,37 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+}
+
+#container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+#localVideoContainer, #remoteVideoContainer {
+    margin: 10px;
+}
+
+video {
+    width: 320px;
+    height: 240px;
+    background-color: black;
+    border: 2px solid #000
+}
+
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+}
+
+#userCount {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+}
