@@ -6,6 +6,7 @@
 
 .video-wrapper {
   position: relative;
+  margin: 10px;
 }
 
 video {
@@ -20,4 +21,6 @@ p {
   background-color: rgba(0, 0, 0, 0.7);
   color: white;
   padding: 5px;
+  font-size: 14px;
+  border-radius: 5px;
 }
