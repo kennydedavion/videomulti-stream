@@ -2,6 +2,7 @@ const socket = io();  // Připojení k WebSocket serveru
 
 let localStream;
 let remoteStreams = {};
+let userId = socket.id;  // Lokální ID uživatele
 let currentMode = 'video';  // Inicializace režimu
 
 const videoContainer = document.getElementById('video-container');
@@ -65,14 +66,14 @@ navigator.mediaDevices.getUserMedia({ video: true, audio: true })
         videoWrapper.classList.add('video-wrapper');
         
         const userIdLabel = document.createElement('p');
-        userIdLabel.textContent = `User ID: Local`;
+        userIdLabel.textContent = `User ID: ${userId}`;
         videoWrapper.appendChild(userIdLabel);
         videoWrapper.appendChild(video);
 
         videoContainer.appendChild(videoWrapper);
 
         // Odeslat lokalní stream do serveru pro další připojení
-        socket.emit('new-connection', { stream: localStream, userId: socket.id });
+        socket.emit('new-connection', { stream: localStream, userId: userId });
     })
     .catch(err => console.error('Error accessing media devices:', err));
 
