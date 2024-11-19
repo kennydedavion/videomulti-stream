@@ -9,9 +9,6 @@ io.on('connection', (socket) => {
         // Informování všech klientů o novém uživateli
         io.emit('user-stream', userId, stream);
     });
-console.log(`New user connected: ${userId}`);
-console.log(`Sending stream to all clients: ${userId}`);
-
     // Při odpojení odstraníme uživatele ze seznamu
     socket.on('disconnect', () => {
         for (let userId in users) {
