@@ -1,49 +1,37 @@
 body {
     font-family: Arial, sans-serif;
-    text-align: center;
     margin: 0;
     padding: 0;
+    background-color: #f0f0f0;
 }
 
-#video-container {
-    display: flex;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
-}
-
-.video-wrapper {
+#container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 200px;
-    height: auto;
+    justify-content: center;
+    height: 100vh;
+}
+
+#localVideoContainer, #remoteVideoContainer {
+    margin: 10px;
 }
 
 video {
-    border: 2px solid #ccc;
-    border-radius: 10px;
-    max-width: 100%;
-    height: auto;
-}
-
-#controls {
-    margin: 20px;
+    width: 320px;
+    height: 240px;
+    background-color: black;
+    border: 2px solid #000;
 }
 
 button {
+    margin: 10px;
     padding: 10px 20px;
     font-size: 16px;
-    cursor: pointer;
 }
 
-#current-mode {
+#userCount {
+    margin-top: 20px;
+    font-size: 18px;
     font-weight: bold;
-}
-
-p {
-    margin: 0;
-    padding: 5px;
-    font-size: 14px;
 }

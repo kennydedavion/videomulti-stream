@@ -1,67 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Chat</title>
-    <style>
-        /* Style for user list and video containers */
-        #user-list {
-            position: absolute;
-            right: 10px;
-            bottom: 10px;
-            max-height: 200px;
-            overflow-y: scroll;
-            background-color: rgba(0, 0, 0, 0.5);
-            color: white;
-            padding: 10px;
-        }
-        #video-container {
-            display: flex;
-            flex-wrap: wrap;
-        }
-        video {
-            width: 300px;
-            height: auto;
-            margin: 10px;
-        }
-    </style>
+    <title>Jiný Vesmír - Video Konference</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="video-container"></div>
-    <div id="user-list"></div>
+    <div id="container">
+        <!-- AR a VR režim tlačítka -->
+        <button id="ar-mode" onclick="enterAR()">AR Režim</button>
+        <button id="vr-mode" onclick="enterVR()">VR Režim</button>
 
-    <script>
-        const videoContainer = document.getElementById('video-container');
-        const userList = document.getElementById('user-list');
+        <!-- Zobrazení videa -->
+        <div id="localVideoContainer">
+            <video id="localVideo" autoplay muted></video>
+        </div>
+        <div id="remoteVideoContainer">
+            <video id="remoteVideo" autoplay></video>
+        </div>
 
-        // Handle new user connection
-        const socket = io();
+        <!-- Počet připojených uživatelů -->
+        <div id="userCount">Uživatelé: 0</div>
+    </div>
 
-        socket.on('new-user', (userId) => {
-            // Display new user in the list
-            const userElement = document.createElement('div');
-            userElement.textContent = `User: ${userId}`;
-            userList.appendChild(userElement);
-
-            // Handle the stream for new user
-            const videoElement = document.createElement('video');
-            videoElement.setAttribute('id', userId);
-            videoContainer.appendChild(videoElement);
-
-            // Assuming here we're using WebRTC to handle streams.
-            navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-                .then(stream => {
-                    videoElement.srcObject = stream;
-                    videoElement.play();
-                })
-                .catch(error => console.log('Error accessing media devices.', error));
-        });
-
-        // Listen for the initial user stream
-        socket.emit('request-user-id');
-    </script>
-
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="/script.js"></script>
 </body>
 </html>

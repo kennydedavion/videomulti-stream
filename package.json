@@ -13,22 +13,26 @@
     "ws": "^8.18.0"
   },
   "name": "jiny.vesmir",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Jiny Vesmir - Misto pro vedome",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "engines": {
-    "node": "18.x"
+    "node": "16.x"
   },
   "repository": {
     "url": "https://jinyvesmir.glitch.me/"
   },
   "author": "Kenny",
-  "license": "MIT",
+  "license": "MISC",
   "keywords": [
     "node",
-    "glitch"
+    "glitch",
+    "video",
+    "websocket",
+    "AR",
+    "VR"
   ]
 }

@@ -1,37 +1,40 @@
 const express = require('express');
 const http = require('http');
-const socketIo = require('socket.io');
+const { Server } = require('socket.io');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = new Server(server);
 
-let users = [];
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(express.static('public'));  // Serve static files (e.g., HTML, JS)
+let users = 0;
 
+// Zpracování připojení uživatelů pomocí Socket.IO
 io.on('connection', (socket) => {
-    // Generate a unique user ID
-    const userId = socket.id;
-    users.push(userId);
-    console.log(`User connected: ${userId}`);
+  users += 1;
+  io.emit('user-count', users);
 
-    // Send new user connection to all clients
-    io.emit('new-user', userId);
+  socket.on('disconnect', () => {
+    users -= 1;
+    io.emit('user-count', users);
+  });
 
-    // Listen for user disconnection
-    socket.on('disconnect', () => {
-        users = users.filter(user => user !== userId);
-        console.log(`User disconnected: ${userId}`);
-        io.emit('user-disconnected', userId);
-    });
+  socket.on('offer', (offer) => {
+    socket.broadcast.emit('offer', offer);
+  });
 
-    // Request for user ID (on page load)
-    socket.on('request-user-id', () => {
-        socket.emit('new-user', userId);
-    });
+  socket.on('answer', (answer) => {
+    socket.broadcast.emit('answer', answer);
+  });
+
+  socket.on('candidate', (candidate) => {
+    socket.broadcast.emit('candidate', candidate);
+  });
 });
 
-server.listen(3000, () => {
-    console.log('Server running on http://localhost:3000');
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Server běží na portu ${PORT}`);
 });
