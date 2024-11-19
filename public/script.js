@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const videoContainer = document.getElementById('video-container');
     const socket = io();
-    const peers = {};  // Pro sledování připojených uživatelů a jejich streamů
+    const peers = {};  // Sledování připojených uživatelů a jejich streamů
     let localStream;
 
     // Přístup k lokálnímu streamu
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
             videoContainer.appendChild(localVideoWrapper);
 
             // Odeslání lokálního streamu po připojení k serveru
-            socket.emit('local-stream-ready', socket.id);
+            socket.emit('local-stream-ready', { userId: socket.id, stream: stream });
         })
         .catch(error => console.error('Error accessing media devices.', error));
 
@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
             label.textContent = `ID: ${userId}`;
             videoElement.setAttribute('autoplay', 'true');
             videoElement.setAttribute('playsinline', 'true');
+            videoElement.setAttribute('controls', 'true'); // přidáno pro lepší kontrolu na mobilu
 
             // Uložení informace o novém uživateli
             videoWrapper.appendChild(label);
@@ -53,7 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Přijetí streamu nového uživatele
     socket.on('user-stream', (userId, stream) => {
         if (peers[userId]) {
-            peers[userId].videoElement.srcObject = stream;
+            const mediaStream = new MediaStream(stream);
+            peers[userId].videoElement.srcObject = mediaStream;
         }
     });
 
