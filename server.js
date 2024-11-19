@@ -1,40 +1,40 @@
 const express = require('express');
 const http = require('http');
-const { Server } = require('socket.io');
-const path = require('path');
+const socketIo = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = socketIo(server);
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 
-let users = 0;
+let users = {}; // Objekt pro uchování všech uživatelů a jejich streamů
 
-// Zpracování připojení uživatelů pomocí Socket.IO
 io.on('connection', (socket) => {
-  users += 1;
-  io.emit('user-count', users);
+    console.log('A user connected: ' + socket.id);
 
-  socket.on('disconnect', () => {
-    users -= 1;
-    io.emit('user-count', users);
-  });
+    // Po připojení odeslat všechny dříve připojené streamy tomuto uživateli
+    for (let userId in users) {
+        socket.emit('user-connected', userId, users[userId].stream);
+    }
 
-  socket.on('offer', (offer) => {
-    socket.broadcast.emit('offer', offer);
-  });
+    // Příjem nového streamu
+    socket.on('new-connection', (data) => {
+        users[socket.id] = {
+            stream: data.stream,
+            userId: socket.id
+        };
 
-  socket.on('answer', (answer) => {
-    socket.broadcast.emit('answer', answer);
-  });
+        // Odeslání nového streamu všem ostatním uživatelům
+        socket.broadcast.emit('user-connected', socket.id, data.stream);
+    });
 
-  socket.on('candidate', (candidate) => {
-    socket.broadcast.emit('candidate', candidate);
-  });
+    socket.on('disconnect', () => {
+        console.log('User disconnected: ' + socket.id);
+        delete users[socket.id];
+    });
 });
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Server běží na portu ${PORT}`);
+server.listen(3000, () => {
+    console.log('Server is running on port 3000');
 });

@@ -1,47 +1,97 @@
-const socket = io();
+const socket = io();  // Připojení k WebSocket serveru
 
-// Proměnné pro video elementy
-const localVideo = document.getElementById('localVideo');
-const remoteVideo = document.getElementById('remoteVideo');
 let localStream;
+let remoteStreams = {};
+let currentMode = 'video';  // Inicializace režimu
 
-// Připojení k videu
+const videoContainer = document.getElementById('video-container');
+const switchModeButton = document.getElementById('switch-mode');
+const currentModeLabel = document.getElementById('current-mode');
+
+// Funkce pro zapnutí AR/VR režimu
+switchModeButton.addEventListener('click', () => {
+    if (currentMode === 'video') {
+        currentMode = 'arvr';
+        currentModeLabel.textContent = 'AR/VR Mode';
+        switchToARVR();
+    } else {
+        currentMode = 'video';
+        currentModeLabel.textContent = 'Video Call';
+        switchToVideo();
+    }
+});
+
+// Funkce pro přepnutí do video režimu
+function switchToVideo() {
+    // Ukázat video streamy ve standardním režimu
+    Object.keys(remoteStreams).forEach(userId => {
+        const stream = remoteStreams[userId];
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.autoplay = true;
+        video.playsInline = true;
+        
+        const videoWrapper = document.createElement('div');
+        videoWrapper.classList.add('video-wrapper');
+        
+        const userIdLabel = document.createElement('p');
+        userIdLabel.textContent = `User ID: ${userId}`;
+        videoWrapper.appendChild(userIdLabel);
+        videoWrapper.appendChild(video);
+
+        videoContainer.appendChild(videoWrapper);
+    });
+}
+
+// Funkce pro přepnutí do AR/VR režimu
+function switchToARVR() {
+    // Přidat AR/VR zobrazení (zde můžete použít knihovny jako A-Frame)
+    const arvrElement = document.createElement('a-scene');
+    const cameraElement = document.createElement('a-camera');
+    arvrElement.appendChild(cameraElement);
+    document.body.appendChild(arvrElement);
+}
+
+// Povolí video a audio stream pro toto zařízení
 navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-  .then((stream) => {
-    localStream = stream;
-    localVideo.srcObject = stream;
+    .then(stream => {
+        localStream = stream;
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.autoplay = true;
+        video.playsInline = true;
+        
+        const videoWrapper = document.createElement('div');
+        videoWrapper.classList.add('video-wrapper');
+        
+        const userIdLabel = document.createElement('p');
+        userIdLabel.textContent = `User ID: Local`;
+        videoWrapper.appendChild(userIdLabel);
+        videoWrapper.appendChild(video);
 
-    // Posílání streamu ostatním uživatelům
-    socket.emit('stream', stream);
-  })
-  .catch((err) => {
-    console.error('Chyba při získávání média:', err);
-  });
+        videoContainer.appendChild(videoWrapper);
 
-// Příjem připojení a streamů od ostatních uživatelů
-socket.on('stream', (data) => {
-  remoteVideo.srcObject = data;
+        // Odeslat lokalní stream do serveru pro další připojení
+        socket.emit('new-connection', { stream: localStream, userId: socket.id });
+    })
+    .catch(err => console.error('Error accessing media devices:', err));
+
+// Přijímání nových streamů od ostatních uživatelů
+socket.on('user-connected', (userId, remoteStream) => {
+    remoteStreams[userId] = remoteStream;
+
+    const video = document.createElement('video');
+    video.srcObject = remoteStream;
+    video.autoplay = true;
+    video.playsInline = true;
+
+    const videoWrapper = document.createElement('div');
+    videoWrapper.classList.add('video-wrapper');
+    
+    const userIdLabel = document.createElement('p');
+    userIdLabel.textContent = `User ID: ${userId}`;
+    videoWrapper.appendChild(userIdLabel);
+    videoWrapper.appendChild(video);
+
+    videoContainer.appendChild(videoWrapper);
 });
-
-// Aktualizace počtu uživatelů
-socket.on('userCount', (count) => {
-  document.getElementById('userCount').innerText = `Uživatelé: ${count}`;
-});
-
-// Funkce pro AR a VR režimy
-function enterAR() {
-  // Implementace AR režimu pouze na mobilních zařízeních
-  if (/Mobi|Android/i.test(navigator.userAgent)) {
-    document.body.requestFullscreen();
-    localVideoContainer.style.display = 'none';
-    // Stereoskopické zobrazení
-  } else {
-    alert('AR režim je podporován pouze na mobilních zařízeních.');
-  }
-}
-
-function enterVR() {
-  // Implementace VR režimu na PC
-  document.body.requestFullscreen();
-  // Interakce s objekty uprostřed obrazovky
-}
