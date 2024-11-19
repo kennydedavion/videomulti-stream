@@ -6,35 +6,31 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-app.use(express.static('public'));
+let users = [];
 
-let users = {}; // Objekt pro uchování všech uživatelů a jejich streamů
+app.use(express.static('public'));  // Obslouží statické soubory
 
 io.on('connection', (socket) => {
-    console.log('A user connected: ' + socket.id);
+    const userId = socket.id;
+    users.push(userId);
+    console.log(`User connected: ${userId}`);
 
-    // Po připojení odeslat všechny dříve připojené streamy tomuto uživateli
-    for (let userId in users) {
-        socket.emit('user-connected', userId, users[userId].stream);
-    }
+    // Odeslání ID nového uživatele všem klientům
+    io.emit('new-user', userId);
 
-    // Příjem nového streamu
-    socket.on('new-connection', (data) => {
-        users[socket.id] = {
-            stream: data.stream,
-            userId: socket.id
-        };
-
-        // Odeslání nového streamu všem ostatním uživatelům
-        socket.broadcast.emit('user-connected', socket.id, data.stream);
+    // Zpracování odpojení uživatele
+    socket.on('disconnect', () => {
+        users = users.filter(user => user !== userId);
+        console.log(`User disconnected: ${userId}`);
+        io.emit('user-disconnected', userId);
     });
 
-    socket.on('disconnect', () => {
-        console.log('User disconnected: ' + socket.id);
-        delete users[socket.id];
+    // Poslání ID uživateli na jeho požádání
+    socket.on('request-user-id', () => {
+        socket.emit('new-user', userId);
     });
 });
 
 server.listen(3000, () => {
-    console.log('Server is running on port 3000');
+    console.log('Server běží na http://localhost:3000');
 });
