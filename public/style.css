@@ -1,47 +1,48 @@
 body {
-  font-family: Arial, sans-serif;
-  background-color: #222;
-  color: #ddd;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
 }
 
-#videos {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  display: flex;
-  flex-wrap: wrap; /* Flexibilní uspořádání */
-  gap: 10px;
-  justify-content: center;
+#video-container {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
 }
 
-#localVideo {
-  border: 2px solid #444;
-  width: 320px;
-  height: 240px;
-  background-color: #000;
-  object-fit: cover;
-}
-
-#remoteVideos {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
+.video-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 200px;
 }
 
 video {
-  border: 2px solid #444;
-  width: 320px;
-  height: 240px;
-  background-color: #000;
-  object-fit: cover;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    max-width: 100%;
+    height: auto;
+}
+
+#controls {
+    margin: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#current-mode {
+    font-weight: bold;
 }
 
 p {
-  color: white;
-  font-size: 12px;
-  margin: 5px;
+    margin: 0;
+    padding: 5px;
+    font-size: 14px;
 }

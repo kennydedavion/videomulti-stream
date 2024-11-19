@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Video Konference - Jiny Vesmir</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Conference with AR/VR</title>
+    <link rel="stylesheet" href="style.css">
+    <script defer src="/socket.io/socket.io.js"></script>
+    <script defer src="script.js"></script>
 </head>
 <body>
-  <div id="videos">
-    <video id="localVideo" autoplay muted playsinline></video>
-    <div id="remoteVideos"></div> <!-- Pro vzdálená videa -->
-  </div>
-  <script src="/socket.io/socket.io.js"></script>  <!-- Načtení Socket.IO -->
-  <script src="script.js"></script>
+    <div id="controls">
+        <button id="switch-mode">Switch to AR/VR</button>
+        <p>Current Mode: <span id="current-mode">Video Call</span></p>
+    </div>
+    
+    <div id="video-container">
+        <!-- Video streams will be dynamically added here -->
+    </div>
 </body>
 </html>
