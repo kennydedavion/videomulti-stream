@@ -8,8 +8,8 @@
     "handlebars": "^4.7.8",
     "merge-descriptors": "^2.0.0",
     "socket.io": "^4.8.1",
-    "simple-peer": "^9.11.0",
-    "uuid": "^8.3.2",
+    "simple-peer": "^9.11.1",
+    "uuid": "^11.0.3",
     "ws": "^8.18.0"
   },
   "name": "jiny.vesmir",
@@ -20,7 +20,7 @@
     "start": "node server.js"
   },
   "engines": {
-    "node": "16.x"
+    "node": "17.0.0"
   },
   "repository": {
     "url": "https://jinyvesmir.glitch.me/"
