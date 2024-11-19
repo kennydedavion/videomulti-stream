@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const videoContainer = document.getElementById('video-container');
     const socket = io();
-    const peers = {};  // Sledování připojených uživatelů a jejich streamů
+    const peers = {}; // Sledování připojených uživatelů a jejich streamů
     let localStream;
 
     // Přístup k lokálnímu streamu
@@ -9,53 +9,32 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(stream => {
             localStream = stream;
 
-            // Vytvoření vlastního video elementu
-            const localVideoWrapper = document.createElement('div');
-            const localVideo = document.createElement('video');
-            const localLabel = document.createElement('p');
-            
-            localLabel.textContent = `ID: ${socket.id}`;
-            localVideo.setAttribute('autoplay', 'true');
-            localVideo.setAttribute('playsinline', 'true');
-            localVideo.srcObject = localStream;
+            // Vytvoření a přidání lokálního videa
+            addVideoElement(socket.id, stream);
 
-            // Přidání ID nad lokální video
-            localVideoWrapper.appendChild(localLabel);
-            localVideoWrapper.appendChild(localVideo);
-            videoContainer.appendChild(localVideoWrapper);
-
-            // Odeslání lokálního streamu po připojení k serveru
-            socket.emit('local-stream-ready', { userId: socket.id, stream: stream });
+            // Odeslání informace o lokálním streamu na server
+            socket.emit('local-stream-ready', { userId: socket.id });
         })
         .catch(error => console.error('Error accessing media devices.', error));
 
-    // Přijetí nového uživatele a jeho ID
+    // Přijetí informací o novém uživateli
     socket.on('new-user', (userId) => {
-        if (userId !== socket.id && !peers[userId]) {
-            // Vytvoření video elementu pro nového uživatele
-            const videoWrapper = document.createElement('div');
-            const videoElement = document.createElement('video');
-            const label = document.createElement('p');
-
-            label.textContent = `ID: ${userId}`;
-            videoElement.setAttribute('autoplay', 'true');
-            videoElement.setAttribute('playsinline', 'true');
-            videoElement.setAttribute('controls', 'true'); // přidáno pro lepší kontrolu na mobilu
-
-            // Uložení informace o novém uživateli
-            videoWrapper.appendChild(label);
-            videoWrapper.appendChild(videoElement);
-            videoContainer.appendChild(videoWrapper);
-
-            peers[userId] = { videoElement, label };
+        if (!peers[userId]) {
+            // Přidání placeholderu pro nového uživatele
+            const placeholderVideo = addVideoElement(userId, null);
+            peers[userId] = { videoElement: placeholderVideo };
         }
     });
 
-    // Přijetí streamu nového uživatele
+    // Přijetí streamu od uživatele
     socket.on('user-stream', (userId, stream) => {
         if (peers[userId]) {
             const mediaStream = new MediaStream(stream);
             peers[userId].videoElement.srcObject = mediaStream;
+        } else {
+            // Přidání nového videa, pokud neexistuje
+            const videoElement = addVideoElement(userId, new MediaStream(stream));
+            peers[userId] = { videoElement };
         }
     });
 
@@ -70,8 +49,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Kontrola každou sekundu pro aktualizaci seznamu uživatelů a streamů
+    // Kontrola a aktualizace seznamu uživatelů každou sekundu
     setInterval(() => {
         socket.emit('check-connected-users');
     }, 1000);
+
+    // Funkce pro přidání video elementu
+    function addVideoElement(userId, stream) {
+        const videoWrapper = document.createElement('div');
+        const videoElement = document.createElement('video');
+        const label = document.createElement('p');
+
+        label.textContent = `ID: ${userId}`;
+        videoElement.setAttribute('autoplay', 'true');
+        videoElement.setAttribute('playsinline', 'true');
+        if (stream) {
+            videoElement.srcObject = stream;
+        }
+
+        // Přidání labelu a videa do kontejneru
+        videoWrapper.appendChild(label);
+        videoWrapper.appendChild(videoElement);
+        videoContainer.appendChild(videoWrapper);
+
+        return videoElement;
+    }
 });
