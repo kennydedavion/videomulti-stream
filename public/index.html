@@ -3,25 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Conference with AR/VR</title>
+    <title>Video Conference</title>
     <link rel="stylesheet" href="style.css">
-    <script defer src="/socket.io/socket.io.js"></script>
-    <script defer src="script.js"></script>
 </head>
 <body>
-    <div id="controls">
-        <button id="switch-mode">Switch to AR/VR</button>
-        <p>Current Mode: <span id="current-mode">Video Call</span></p>
-    </div>
-    
     <div id="video-container">
-        <!-- Video streams budou dynamicky přidány zde -->
+        <!-- Video streamy budou dynamicky přidány sem -->
     </div>
-    
-    <div id="user-log">
-        <!-- Seznam připojených uživatelů s jejich ID -->
-        <h3>Connected Users:</h3>
-        <div id="user-list"></div>
-    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

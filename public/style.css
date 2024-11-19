@@ -1,29 +1,12 @@
+/* Style pro zobrazení video streamů */
 #video-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.video-wrapper {
-    margin: 10px;
-    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 video {
-  max-width: 300px;
-    border: 2px solid #ccc;
-}
-#user-id {
-    font-size: 14px;
-    color: #333;
-}
-p {
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 5px;
-  font-size: 14px;
-  border-radius: 5px;
+    width: 300px;
+    height: 200px;
+    border: 2px solid #000;
 }
