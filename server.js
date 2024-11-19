@@ -1,40 +1,73 @@
-const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ port: 3000 });
 
-const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
+let connectedUsers = {}; // Skladování připojených uživatelů
 
-app.use(express.static('public'));
+wss.on('connection', ws => {
+    let userId;
 
-let users = {}; // Objekt pro uchování všech uživatelů a jejich streamů
+    ws.on('message', message => {
+        const msg = JSON.parse(message);
+        
+        if (msg.type === 'new-user') {
+            userId = msg.userId;
+            connectedUsers[userId] = ws;
+            console.log(`Nový uživatel připojen: ${userId}`);
+            
+            // Odeslat připojeným uživatelům nové připojení
+            Object.keys(connectedUsers).forEach(id => {
+                if (id !== userId) {
+                    connectedUsers[id].send(JSON.stringify({
+                        type: 'user-connected',
+                        userId: userId
+                    }));
+                }
+            });
+        }
 
-io.on('connection', (socket) => {
-    console.log('A user connected: ' + socket.id);
+        if (msg.type === 'offer') {
+            const { to, offer } = msg;
+            if (connectedUsers[to]) {
+                connectedUsers[to].send(JSON.stringify({
+                    type: 'offer',
+                    userId: userId,
+                    offer: offer
+                }));
+            }
+        }
 
-    // Po připojení odeslat všechny dříve připojené streamy tomuto uživateli
-    for (let userId in users) {
-        socket.emit('user-connected', userId, users[userId].stream);
-    }
+        if (msg.type === 'answer') {
+            const { to, answer } = msg;
+            if (connectedUsers[to]) {
+                connectedUsers[to].send(JSON.stringify({
+                    type: 'answer',
+                    userId: userId,
+                    answer: answer
+                }));
+            }
+        }
 
-    // Příjem nového streamu
-    socket.on('new-connection', (data) => {
-        users[socket.id] = {
-            stream: data.stream,
-            userId: socket.id
-        };
+        if (msg.type === 'candidate') {
+            const { to, candidate } = msg;
+            if (connectedUsers[to]) {
+                connectedUsers[to].send(JSON.stringify({
+                    type: 'candidate',
+                    userId: userId,
+                    candidate: candidate
+                }));
+            }
+        }
 
-        // Odeslání nového streamu všem ostatním uživatelům
-        socket.broadcast.emit('user-connected', socket.id, data.stream);
+        if (msg.type === 'new-user-stream') {
+            const { userId, stream } = msg;
+            console.log(`Nový stream pro uživatele: ${userId}`);
+        }
     });
 
-    socket.on('disconnect', () => {
-        console.log('User disconnected: ' + socket.id);
-        delete users[socket.id];
+    ws.on('close', () => {
+        delete connectedUsers[userId];
+        console.log(`Uživatel odpojen: ${userId}`);
     });
 });
 
-server.listen(3000, () => {
-    console.log('Server is running on port 3000');
-});
+console.log('Server běží na portu 3000');
