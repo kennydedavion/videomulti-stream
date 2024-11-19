@@ -10,17 +10,19 @@ const io = new Server(server);
 app.use(express.static(path.join(__dirname, 'public')));
 
 io.on('connection', (socket) => {
-  // Přijetí nabídky a předání druhému zařízení
+  console.log('New connection established: ' + socket.id);
+
+  // Odeslání nabídky (offer) ostatním uživatelům
   socket.on('offer', (offer) => {
     socket.broadcast.emit('offer', offer);
   });
 
-  // Přijetí odpovědi a předání druhému zařízení
+  // Odeslání odpovědi (answer) ostatním uživatelům
   socket.on('answer', (answer) => {
     socket.broadcast.emit('answer', answer);
   });
 
-  // Přijetí ICE kandidáta a předání druhému zařízení
+  // Odeslání ICE kandidátů ostatním uživatelům
   socket.on('candidate', (candidate) => {
     socket.broadcast.emit('candidate', candidate);
   });
