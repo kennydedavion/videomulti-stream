@@ -3,11 +3,11 @@
     "@fastify/formbody": "^8.0.1",
     "@fastify/static": "^8.0.2",
     "@fastify/view": "^10.0.1",
-    "express": "^4.17.1",
+    "express": "^5.0.1",
     "fastify": "^5.1.0",
     "handlebars": "^4.7.8",
     "socket.io": "^4.8.1",
-    "ws": "^8.2.3"
+    "ws": "^8.18.0"
   },
   "name": "jiny.vesmir",
   "version": "0.1.0",
@@ -15,8 +15,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "video-server": "node video-server/server.js",
-    "video-server-2": "node video-server-2/server2.js"
+    "video-server": "node video-server/server.js"
   },
   "engines": {
     "node": "16.x"
