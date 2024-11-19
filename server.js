@@ -1,36 +1,32 @@
 const express = require('express');
 const http = require('http');
-const socketIo = require('socket.io');
+const { Server } = require('socket.io');
 const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = new Server(server);
 
-const PORT = 3000;
-
-// Nastavení statické složky pro soubory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Správa připojení WebSocketů
-let users = 0;
-
 io.on('connection', (socket) => {
-  users++;
-  io.emit('userCount', users);
-
-  socket.on('disconnect', () => {
-    users--;
-    io.emit('userCount', users);
+  // Přijetí nabídky a předání druhému zařízení
+  socket.on('offer', (offer) => {
+    socket.broadcast.emit('offer', offer);
   });
 
-  // Správa přenosu streamů
-  socket.on('stream', (data) => {
-    socket.broadcast.emit('stream', data);
+  // Přijetí odpovědi a předání druhému zařízení
+  socket.on('answer', (answer) => {
+    socket.broadcast.emit('answer', answer);
+  });
+
+  // Přijetí ICE kandidáta a předání druhému zařízení
+  socket.on('candidate', (candidate) => {
+    socket.broadcast.emit('candidate', candidate);
   });
 });
 
-// Spuštění serveru
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-  console.log(`Server běží na http://localhost:${PORT}`);
+  console.log(`Server běží na portu ${PORT}`);
 });

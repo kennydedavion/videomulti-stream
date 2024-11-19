@@ -1,37 +1,25 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f0f0f0;
+  font-family: Arial, sans-serif;
+  background-color: #222;
+  color: #ddd;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
-#container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-}
-
-#localVideoContainer, #remoteVideoContainer {
-    margin: 10px;
+#videos {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 video {
-    width: 320px;
-    height: 240px;
-    background-color: black;
-    border: 2px solid #000
-}
-
-button {
-    margin: 10px;
-    padding: 10px 20px;
-    font-size: 16px;
-}
-
-#userCount {
-    margin-top: 20px;
-    font-size: 18px;
-    font-weight: bold;
+  border: 2px solid #444;
+  width: 320px;
+  height: 240px;
+  background-color: #000;
+  object-fit: cover;
 }

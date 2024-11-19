@@ -1,48 +1,67 @@
+const socket = io(); // Ověř, že knihovna Socket.IO je správně načtena
 
-const socket = io();
-
-// Proměnné pro video elementy
 const localVideo = document.getElementById('localVideo');
 const remoteVideo = document.getElementById('remoteVideo');
+
 let localStream;
+let peerConnection;
+const config = {
+  iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+};
 
-// Připojení k videu
-navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-  .then((stream) => {
-    localStream = stream;
-    localVideo.srcObject = stream;
+// Získání kamery a mikrofonu
+async function startVideo() {
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    localVideo.srcObject = localStream;
 
-    // Posílání streamu ostatním uživatelům
-    socket.emit('stream', stream);
-  })
-  .catch((err) => {
-    console.error('Chyba při získávání média:', err);
-  });
-
-// Příjem připojení a streamů od ostatních uživatelů
-socket.on('stream', (data) => {
-  remoteVideo.srcObject = data;
-});
-
-// Aktualizace počtu uživatelů
-socket.on('userCount', (count) => {
-  document.getElementById('userCount').innerText = `Uživatelé: ${count}`;
-});
-
-// Funkce pro AR a VR režimy
-function enterAR() {
-  // Implementace AR režimu pouze na mobilních zařízeních
-  if (/Mobi|Android/i.test(navigator.userAgent)) {
-    document.body.requestFullscreen();
-    localVideoContainer.style.display = 'none';
-    // Stereoskopické zobrazení
-  } else {
-    alert('AR režim je podporován pouze na mobilních zařízeních.');
+    setupPeerConnection();
+  } catch (err) {
+    console.error('Přístup ke kameře a mikrofonu byl odmítnut', err);
   }
 }
 
-function enterVR() {
-  // Implementace VR režimu na PC
-  document.body.requestFullscreen();
-  // Interakce s objekty uprostřed obrazovky
+// Nastavení Peer-to-Peer připojení
+function setupPeerConnection() {
+  peerConnection = new RTCPeerConnection(config);
+  localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+  peerConnection.ontrack = (event) => {
+    if (!remoteVideo.srcObject) {
+      remoteVideo.srcObject = event.streams[0];
+    }
+  };
+
+  peerConnection.onicecandidate = (event) => {
+    if (event.candidate) {
+      socket.emit('candidate', event.candidate);
+    }
+  };
 }
+
+// Zpracování Socket.IO událostí
+socket.on('offer', async (offer) => {
+  if (!peerConnection) setupPeerConnection();
+
+  await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+  const answer = await peerConnection.createAnswer();
+  await peerConnection.setLocalDescription(answer);
+  socket.emit('answer', answer);
+});
+
+socket.on('answer', async (answer) => {
+  if (!peerConnection) return;
+  await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+});
+
+socket.on('candidate', async (candidate) => {
+  if (!peerConnection) return;
+  try {
+    await peerConnection.addIceCandidate(candidate);
+  } catch (error) {
+    console.error('Chyba při přidávání ICE kandidáta', error);
+  }
+});
+
+// Spuštění videa
+startVideo();

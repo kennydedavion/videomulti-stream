@@ -1,29 +1,17 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jiný Vesmír - Video Konference</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Konference - Jiny Vesmir</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="container">
-        <!-- AR a VR režim tlačítka -->
-        <button id="ar-mode" onclick="enterAR()">AR Režim</button>
-        <button id="vr-mode" onclick="enterVR()">VR Režim</button>
-
-        <!-- Zobrazení videa -->
-        <div id="localVideoContainer">
-            <video id="localVideo" autoplay muted></video>
-        </div>
-        <div id="remoteVideoContainer">
-            <video id="remoteVideo" autoplay></video>
-        </div>
-
-        <!-- Počet připojených uživatelů -->
-        <div id="userCount">Uživatelé: 0</div>
-    </div>
-
-    <script src="/script.js"></script>
+  <div id="videos">
+    <video id="localVideo" autoplay muted playsinline></video>
+    <video id="remoteVideo" autoplay playsinline></video>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
