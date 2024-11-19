@@ -1,32 +1,53 @@
-const io = require('socket.io')(server);
+const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
+
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: '*', // Umožňuje připojení z libovolné domény
+    methods: ['GET', 'POST'],
+  },
+});
+
 const users = {}; // Udržujeme seznam uživatelů
 
+// Definice portu
+const PORT = process.env.PORT || 3000;
+
+// Servírování statických souborů
+app.use(express.static('public'));
+
+// Při připojení nového socketu
 io.on('connection', (socket) => {
-    // Připojení nového uživatele a obdržení jeho streamu
-    socket.on('local-stream-ready', ({ userId, stream }) => {
-        // Uložení uživatele a jeho streamu
-        users[userId] = { socketId: socket.id, stream };
+  console.log('New user connected: ' + socket.id);
 
-        // Informování nového klienta o všech existujících uživatelích
-        for (let existingUserId in users) {
-            if (existingUserId !== userId) {
-                socket.emit('user-stream', existingUserId, users[existingUserId].stream);
-            }
-        }
+  // Uložení streamu a informování ostatních klientů
+  socket.on('local-stream-ready', ({ userId, stream }) => {
+    users[userId] = { socketId: socket.id, stream };
 
-        // Informování všech ostatních klientů o novém uživateli
-        socket.broadcast.emit('user-stream', userId, stream);
-    });
+    // Informujeme všechny připojené klienty
+    io.emit('user-stream', userId, stream);
+  });
 
-    // Při odpojení odstraníme uživatele ze seznamu
-    socket.on('disconnect', () => {
-        for (let userId in users) {
-            if (users[userId].socketId === socket.id) {
-                delete users[userId];
-                // Informujeme klienty, že uživatel byl odpojen
-                io.emit('user-disconnected', userId);
-                break;
-            }
-        }
-    });
+  // Při odpojení uživatele
+  socket.on('disconnect', () => {
+    for (let userId in users) {
+      if (users[userId].socketId === socket.id) {
+        delete users[userId];
+        // Informujeme všechny, že uživatel byl odpojen
+        io.emit('user-disconnected', userId);
+        break;
+      }
+    }
+  });
+
+  // Informování všech o aktuálním seznamu uživatelů po připojení nového uživatele
+  socket.emit('current-users', Object.keys(users));
+});
+
+// Spuštění serveru na specifikovaném portu
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
