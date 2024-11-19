@@ -1,9 +1,9 @@
 const express = require('express');
 const path = require('path');
-
 const app = express();
 const PORT = 4000;
 
+// Statické soubory pro druhý server
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
@@ -11,5 +11,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Video server 1 is running on http://localhost:${PORT}`);
+  console.log(`Video server běží na http://localhost:${PORT}`);
 });

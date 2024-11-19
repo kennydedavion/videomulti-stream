@@ -1,18 +1,15 @@
 const express = require('express');
-const http = require('http');
-const WebSocket = require('ws');
 const path = require('path');
-
 const app = express();
+const PORT = 3000;
 
-const PORT = process.env.PORT || 3000;
+app.use(express.static('public'));
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// Přesměrování na druhý server
+app.get('/video-server', (req, res) => {
+  res.redirect('http://localhost:4000');
 });
 
 app.listen(PORT, () => {
-  console.log(`Main server is running on http://localhost:${PORT}`);
+  console.log(`Hlavní server běží na http://localhost:${PORT}`);
 });
