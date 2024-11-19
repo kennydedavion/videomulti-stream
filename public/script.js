@@ -1,77 +1,43 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const videoContainer = document.getElementById('video-container');
-    const socket = io();
-    const peers = {}; // Sledování připojených uživatelů a jejich streamů
-    let localStream;
+const videoContainer = document.getElementById('video-container');
+const peers = {}; // Udržujeme seznam uživatelů a jejich streamů
 
-    // Přístup k lokálnímu streamu
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-        .then(stream => {
-            localStream = stream;
+// Připojení ke socketu
+const socket = io();
 
-            // Vytvoření a přidání lokálního videa
-            addVideoElement(socket.id, stream);
+// Funkce na přidání nového video elementu
+function addVideoElement(userId, stream) {
+    // Kontrola, zda už video pro dané userId neexistuje
+    if (peers[userId]) return; 
 
-            // Odeslání informace o lokálním streamu na server
-            socket.emit('local-stream-ready', { userId: socket.id });
-        })
-        .catch(error => console.error('Error accessing media devices.', error));
+    const videoElement = document.createElement('video');
+    videoElement.setAttribute('data-user-id', userId);
+    videoElement.autoplay = true;
+    videoElement.playsInline = true;
+    videoElement.srcObject = stream;
 
-    // Přijetí informací o novém uživateli
-    socket.on('new-user', (userId) => {
-        if (!peers[userId]) {
-            // Přidání placeholderu pro nového uživatele
-            const placeholderVideo = addVideoElement(userId, null);
-            peers[userId] = { videoElement: placeholderVideo };
-        }
-    });
+    // Přidáme video do kontejneru
+    videoContainer.appendChild(videoElement);
+    peers[userId] = { videoElement };
+}
 
-    // Přijetí streamu od uživatele
-    socket.on('user-stream', (userId, stream) => {
-        if (peers[userId]) {
-            const mediaStream = new MediaStream(stream);
-            peers[userId].videoElement.srcObject = mediaStream;
-        } else {
-            // Přidání nového videa, pokud neexistuje
-            const videoElement = addVideoElement(userId, new MediaStream(stream));
-            peers[userId] = { videoElement };
-        }
-    });
-
-    // Zpracování odpojení uživatele
-    socket.on('user-disconnected', (userId) => {
-        if (peers[userId]) {
-            const videoWrapper = peers[userId].videoElement.parentNode;
-            if (videoWrapper) {
-                videoWrapper.remove();
-            }
-            delete peers[userId];
-        }
-    });
-
-    // Kontrola a aktualizace seznamu uživatelů každou sekundu
-    setInterval(() => {
-        socket.emit('check-connected-users');
-    }, 1000);
-
-    // Funkce pro přidání video elementu
-    function addVideoElement(userId, stream) {
-        const videoWrapper = document.createElement('div');
-        const videoElement = document.createElement('video');
-        const label = document.createElement('p');
-
-        label.textContent = `ID: ${userId}`;
-        videoElement.setAttribute('autoplay', 'true');
-        videoElement.setAttribute('playsinline', 'true');
-        if (stream) {
-            videoElement.srcObject = stream;
-        }
-
-        // Přidání labelu a videa do kontejneru
-        videoWrapper.appendChild(label);
-        videoWrapper.appendChild(videoElement);
-        videoContainer.appendChild(videoWrapper);
-
-        return videoElement;
+// Odstraníme video pro konkrétního uživatele
+function removeVideoElement(userId) {
+    if (peers[userId]) {
+        const { videoElement } = peers[userId];
+        videoContainer.removeChild(videoElement);
+        delete peers[userId];
     }
+}
+
+// Event pro zobrazení streamu nového uživatele
+socket.on('user-stream', (userId, stream) => {
+    // Pokud už stream existuje, ignorujeme ho
+    if (peers[userId]) return;
+    const mediaStream = new MediaStream(stream);
+    addVideoElement(userId, mediaStream);
+});
+
+// Event pro odstranění uživatele při odpojení
+socket.on('user-disconnected', (userId) => {
+    removeVideoElement(userId);
 });
