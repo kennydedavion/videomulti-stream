@@ -1,40 +1,42 @@
-const videoContainer = document.getElementById('video-container');
-const peers = {}; // Udržujeme seznam uživatelů a jejich streamů
+document.addEventListener('DOMContentLoaded', function () {
+  // Odkazy na video prvky a další prvky na stránce
+  const localVideo = document.getElementById('localVideo');
+  const remoteVideo = document.getElementById('remoteVideo');
+  const signalDataTextarea = document.getElementById('signalData');
+  const otherPeerDataInput = document.getElementById('otherPeerDataInput');
+  const connectButton = document.getElementById('connectButton');
+  let localStream;
 
-// Funkce na přidání nového video elementu
-function addVideoElement(userId, stream) {
-    // Kontrola, zda už video pro dané userId neexistuje
-    if (peers[userId]) return; 
+  // Získání místního streamu (kamera + mikrofon)
+  navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+    localVideo.srcObject = stream;
+    localStream = stream;
 
-    const videoElement = document.createElement('video');
-    videoElement.setAttribute('data-user-id', userId);
-    videoElement.autoplay = true;
-    videoElement.playsInline = true;
-    videoElement.srcObject = stream;
+    // Vytvoření nového SimplePeer instance
+    const peer = new SimplePeer({
+      initiator: location.hash === '#1', // Jedna strana bude inicializátor (#1)
+      trickle: false,
+      stream: localStream
+    });
 
-    // Přidáme video do kontejneru
-    videoContainer.appendChild(videoElement);
-    peers[userId] = { videoElement };
-}
+    // Zobrazení signálových dat v textovém poli
+    peer.on('signal', data => {
+      signalDataTextarea.value = JSON.stringify(data);
+    });
 
-// Odstraníme video pro konkrétního uživatele
-function removeVideoElement(userId) {
-    if (peers[userId]) {
-        const { videoElement } = peers[userId];
-        videoContainer.removeChild(videoElement);
-        delete peers[userId];
-    }
-}
+    // Přijetí vzdáleného streamu a zobrazení ve video prvku
+    peer.on('stream', remoteStream => {
+      remoteVideo.srcObject = remoteStream;
+    });
 
-// Event pro zobrazení streamu nového uživatele
-socket.on('user-stream', (userId, stream) => {
-    // Pokud už stream existuje, ignorujeme ho
-    if (peers[userId]) return;
-    const mediaStream = new MediaStream(stream);
-    addVideoElement(userId, mediaStream);
-});
-
-// Event pro odstranění uživatele při odpojení
-socket.on('user-disconnected', (userId) => {
-    removeVideoElement(userId);
+    // Obsluha kliknutí na tlačítko pro připojení k druhému uživateli
+    connectButton.addEventListener('click', () => {
+      const otherPeerData = otherPeerDataInput.value;
+      if (otherPeerData) {
+        peer.signal(JSON.parse(otherPeerData));
+      }
+    });
+  }).catch(err => {
+    console.error('Nepodařilo se získat místní stream:', err);
+  });
 });

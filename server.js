@@ -1,31 +1,14 @@
-const { Server } = require("socket.io");
-const http = require("http");
-const app = require("express")();
+const express = require('express');
+const http = require('http');
+const path = require('path');
+const app = express();
 const server = http.createServer(app);
-const io = new Server(server); // Správná inicializace socket.io
-const users = {}; // Seznam uživatelů
 
-io.on("connection", (socket) => {
-  socket.on("local-stream-ready", ({ userId, stream }) => {
-    // Uložení uživatele a jeho streamu
-    users[userId] = { socketId: socket.id, stream };
+// Servírování statických souborů z public složky
+app.use(express.static(path.join(__dirname, 'public')));
 
-    // Informování všech klientů o novém streamu
-    io.emit("user-stream", userId, stream);
-  });
-
-  socket.on("disconnect", () => {
-    for (let userId in users) {
-      if (users[userId].socketId === socket.id) {
-        delete users[userId];
-        // Informujeme klienty o odpojení
-        io.emit("user-disconnected", userId);
-        break;
-      }
-    }
-  });
-});
-
-server.listen(3000, () => {
-  console.log("Server is running on port 3000");
+// Port nastavení
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Server běží na portu ${PORT}`);
 });
