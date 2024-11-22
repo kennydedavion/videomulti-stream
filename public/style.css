@@ -1,0 +1,12 @@
+/* Style pro zobrazení video streamů */
+#video-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+video {
+    width: 300px;
+    height: 200px;
+    border: 2px solid #000;
+}
