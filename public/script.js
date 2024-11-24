@@ -1,40 +1,69 @@
 document.addEventListener('DOMContentLoaded', function () {
-  // Odkazy na video prvky
-  const localVideo = document.getElementById('localVideo');
-  const remoteVideo = document.getElementById('remoteVideo');
+  // Ověření, zda je SimplePeer dostupný
+  if (typeof SimplePeer === 'undefined') {
+    console.error('SimplePeer není definován! Ujisti se, že je knihovna správně načtena.');
+    return;
+  }
+
+  // Tady začíná zbytek kódu pro vytvoření Peerů, připojení a přenos médií
+
+  const localVideo1 = document.getElementById('localVideo1');
+  const localVideo2 = document.getElementById('localVideo2');
+  const localVideo3 = document.getElementById('localVideo3');
+
+  const signalData1 = document.getElementById('signalData1');
+  const signalData2 = document.getElementById('signalData2');
+  const signalData3 = document.getElementById('signalData3');
+
+  const connectButton1 = document.getElementById('connectButton1');
+  const connectButton2 = document.getElementById('connectButton2');
+  const connectButton3 = document.getElementById('connectButton3');
+
   let localStream;
 
   // Získání místního streamu (kamera + mikrofon)
   navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
-    localVideo.srcObject = stream;
+    // Nastavení streamu pro všechna videa
+    localVideo1.srcObject = stream;
+    localVideo2.srcObject = stream;
+    localVideo3.srcObject = stream;
     localStream = stream;
 
-    // Vytvoření nového SimplePeer instance
-    const peer = new SimplePeer({
-      initiator: location.hash === '#1', // Jedna strana bude inicializátor (#1)
-      trickle: false,
-      stream: localStream
-    });
+    // Vytvoření tří SimplePeer instancí
+    const peer1 = createPeer(stream, signalData1);
+    const peer2 = createPeer(stream, signalData2);
+    const peer3 = createPeer(stream, signalData3);
 
-    // Zachytávání signálu a jeho sdílení s druhým peerem
-    peer.on('signal', data => {
-      console.log('SIGNAL', JSON.stringify(data));
-      alert('SIGNAL DATA: ' + JSON.stringify(data)); // Ukáže data ke sdílení
-    });
+    // Obsluha tlačítek pro připojení
+    connectButton1.addEventListener('click', () => handleConnection(peer1, signalData1));
+    connectButton2.addEventListener('click', () => handleConnection(peer2, signalData2));
+    connectButton3.addEventListener('click', () => handleConnection(peer3, signalData3));
 
-    // Přijetí vzdáleného streamu a zobrazení ve video prvku
-    peer.on('stream', remoteStream => {
-      remoteVideo.srcObject = remoteStream;
-    });
-
-    // Tlačítko pro připojení k druhému uživateli
-    document.getElementById('connectButton').addEventListener('click', () => {
-      const otherPeerData = prompt('Vložte data z druhého peeru');
-      if (otherPeerData) {
-        peer.signal(JSON.parse(otherPeerData));
-      }
-    });
   }).catch(err => {
     console.error('Nepodařilo se získat místní stream:', err);
   });
+
+  // Funkce pro vytvoření SimplePeer instance
+  function createPeer(stream, signalTextarea) {
+    const peer = new SimplePeer({
+      initiator: location.hash === '#1',
+      trickle: false,
+      stream: stream
+    });
+
+    // Zobrazení signálových dat v textovém poli
+    peer.on('signal', data => {
+      signalTextarea.value = JSON.stringify(data);
+    });
+
+    return peer;
+  }
+
+  // Funkce pro připojení k druhému uživateli
+  function handleConnection(peer, signalTextarea) {
+    const otherPeerData = prompt('Vložte signálová data druhého uživatele:');
+    if (otherPeerData) {
+      peer.signal(JSON.parse(otherPeerData));
+    }
+  }
 });
