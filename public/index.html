@@ -4,18 +4,25 @@
   <title>A-Frame AR s WebRTC</title>
   <!-- Zahrň A-Frame knihovnu -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  
-  <!-- Zahrň Simple-Peer knihovnu pro WebRTC (měla by být definována dříve než script.js) -->
+  <!-- Zahrň Simple-Peer knihovnu pro WebRTC -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-peer/9.11.1/simple-peer.min.js"></script>
-  
-  <!-- Zahrň vlastní JavaScript soubor -->
+  <!-- Zahrň vlastní JavaScript soubor (script.js) -->
   <script src="/script.js" defer></script>
-  
-  <style>
-    /* Styl pro rozložení a vzhled stránky, jak je uvedeno dříve */
-  </style>
 </head>
 <body>
-  <!-- Tělo stránky, jak je uvedeno dříve -->
+  <!-- AR scéna -->
+  <a-scene>
+    <a-box position="0 1 -5" rotation="0 45 0" color="#4CC3D9" shadow></a-box>
+    <a-sky color="#ECECEC"></a-sky>
+  </a-scene>
+
+  <!-- HTML pro WebRTC video streamy -->
+  <div>
+    <video id="localVideo" autoplay playsinline muted></video>
+    <video id="remoteVideo" autoplay playsinline></video>
+  </div>
+
+  <!-- Tlačítko pro spojení WebRTC -->
+  <button id="connectButton">Připojit k druhému uživateli</button>
 </body>
 </html>
