@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /******************************************************************************
 START Glitch hello-app default styles
 
@@ -199,4 +200,17 @@ label {
 }
 h2 {
   color: var(--color-text-header);
+=======
+/* Style pro zobrazení video streamů */
+#video-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+video {
+    width: 300px;
+    height: 200px;
+    border: 2px solid #000;
+>>>>>>> 5e96edb65227d90ff4ba631b4be056c42dc332ea
 }
