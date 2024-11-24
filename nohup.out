@@ -2,3 +2,6 @@
  2 files changed, 28 insertions(+)
  create mode 100755 auto_commit.sh
  create mode 100644 nohup.out
+[main 6823bd0] Version 0.0.1
+ 1 file changed, 41 insertions(+)
+ create mode 100755 rewind_commit.sh
