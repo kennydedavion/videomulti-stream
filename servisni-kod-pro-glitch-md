@@ -1,0 +1,6 @@
+git init
+git remote add origin https://github.com/kennydedavion/videomulti-stream.git
+git checkout -b 0.0.50
+git add .
+git commit -m "Initial commit for version 0.1.1" // zmen cislo verze
+git push -u origin 0.0.50
