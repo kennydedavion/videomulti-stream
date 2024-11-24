@@ -1,0 +1,28 @@
+name: Migrate Glitch to GitHub
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install axios simple-git
+
+      - name: Run migration script
+        env:
+          GLITCH_PROJECT_ID: ${{ secrets.GLITCH_PROJECT_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node migrate.js
