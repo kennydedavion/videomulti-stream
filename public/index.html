@@ -1,52 +1,78 @@
+
+
 <!DOCTYPE html>
 <html>
 <head>
   <title>A-Frame AR s WebRTC</title>
   <!-- Zahrň A-Frame knihovnu -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <!-- Zahrň Simple-Peer knihovnu pro WebRTC -->
+  
+  <!-- Zahrň Simple-Peer knihovnu pro WebRTC (měla by být definována dříve než script.js) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-peer/9.11.1/simple-peer.min.js"></script>
+  
   <!-- Zahrň vlastní JavaScript soubor -->
   <script src="/script.js" defer></script>
   <style>
-    /* Styl pro video prvky */
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    #videoContainer {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-start;
+      width: 100%;
+      padding: 10px;
+    }
+
+    .videoFrame {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 350px;
+      background-color: #f0f0f0;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
     video {
-      width: 300px;
-      height: 200px;
-      margin: 10px;
+      width: 100%;
+      height: auto;
       background-color: black;
     }
 
-    /* Umístění videí na stránku */
-    #videoContainer {
-      position: absolute;
-      bottom: 50px;
-      left: 10px;
+    .signalSection {
+      margin-top: 10px;
       display: flex;
-      gap: 10px;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
     }
 
-    /* Styl tlačítka pro připojení */
-    #connectButton {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
+    .signalData {
+      width: 100%;
+      height: 50px;
+      margin: 5px 0;
+    }
+
+    .connectButton {
       padding: 10px 20px;
       background-color: #4CAF50;
       color: white;
       border: none;
       cursor: pointer;
+      margin: 5px 0;
     }
 
-    #signalData {
-      width: 80%;
-      height: 50px;
-      margin: 10px 0;
-    }
-
-    #otherPeerDataInput {
-      width: 80%;
-      height: 50px;
+    /* Média dotazy pro mobilní zařízení */
+    @media (max-width: 768px) {
+      #videoContainer {
+        flex-direction: column;
+        align-items: center;
+      }
     }
   </style>
 </head>
@@ -59,11 +85,34 @@
 
   <!-- Kontejner pro WebRTC videa -->
   <div id="videoContainer">
-    <video id="localVideo" autoplay playsinline muted></video>
-    <video id="remoteVideo" autoplay playsinline></video>
-  </div>
+    <!-- Video Frame 1 -->
+    <div class="videoFrame">
+      <video id="localVideo1" autoplay playsinline muted></video>
+      <div class="signalSection">
+        <textarea id="signalData1" class="signalData" readonly></textarea>
+        <button id="connectButton1" class="connectButton">Připojit Video 1</button>
+      </div>
+    </div>
 
-  <!-- Tlačítko pro spojení WebRTC -->
-  <button id="connectButton">Připojit k druhému uživateli</button>
+    <!-- Video Frame 2 -->
+    <div class="videoFrame">
+      <video id="localVideo2" autoplay playsinline muted></video>
+      <div class="signalSection">
+        <textarea id="signalData2" class="signalData" readonly></textarea>
+        <button id="connectButton2" class="connectButton">Připojit Video 2</button>
+      </div>
+    </div>
+
+    <!-- Video Frame 3 -->
+    <div class="videoFrame">
+      <video id="localVideo3" autoplay playsinline muted></video>
+      <div class="signalSection">
+        <textarea id="signalData3" class="signalData" readonly></textarea>
+        <button id="connectButton3" class="connectButton">Připojit Video 3</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
+
+

@@ -1,3 +1,5 @@
+
+
 document.addEventListener('DOMContentLoaded', function () {
   // Odkazy na video prvky
   const localVideo = document.getElementById('localVideo');
@@ -38,3 +40,6 @@ document.addEventListener('DOMContentLoaded', function () {
     console.error('Nepodařilo se získat místní stream:', err);
   });
 });
+
+
+
